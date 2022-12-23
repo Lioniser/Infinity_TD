@@ -8,7 +8,7 @@ public class EnemyMovement : MonoBehaviour
 
     private PathFinding pathfinder;
     private EnemyDamage damage;
-    [SerializeField] float speed = 1f;
+    public float speed = 1f;
 
     castle castle;
     Vector3 startPos;

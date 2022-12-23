@@ -46,7 +46,7 @@ public class FrostButton : MonoBehaviour
 
     private void CalculatelvlUpPrice()
     {
-        _lvlUpPrice = Mathf.RoundToInt(Mathf.Sqrt(tower.lvl - 1) * 5f + _lvlUpPrice);
+        _lvlUpPrice = Mathf.RoundToInt(Mathf.Sqrt(tower.lvl - 1) * 10f + _lvlUpPrice);
         tower.lvlUP_price_txt.text = "o" + _lvlUpPrice;
     }
 }

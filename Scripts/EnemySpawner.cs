@@ -21,6 +21,7 @@ public class EnemySpawner : MonoBehaviour
 
     void Start()
     {
+        enemyPref.speed = 1f;
     }
     private void Update() 
     {
@@ -58,10 +59,13 @@ public class EnemySpawner : MonoBehaviour
             spawnTime = Mathf.Round((Mathf.Sqrt(i) / i)*100)/100;
 
             yield return StartCoroutine(enemySpawn());
-
+            //Зміни у хвилі
             mobNumberInWave = mobNumberInWave + 3;
             if (i%5 == 0)
             mobNumberInWave = mobNumberInWave + 5;
+            if (i%2 == 0)
+            enemyPref.speed = enemyPref.speed / 1.1f;
+            //Наступна хвиля
             waveTime = 10f * i;
             waveActive = false;
             waveNum++;

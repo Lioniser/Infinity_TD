@@ -113,7 +113,7 @@ public class UI_Controller : MonoBehaviour
     }
     private void CheckWIN()
     {
-        if (spawner.waveNum == 10 && spawner.start && spawner.transform.childCount == 0)
+        if (spawner.waveNum == 11 && spawner.start && spawner.transform.childCount == 0)
         {
         spawner.start = false;
         StopCoroutine(spawner.waveSpawner);
