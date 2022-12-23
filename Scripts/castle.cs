@@ -5,7 +5,6 @@ using UnityEngine.UI;
 public class castle : MonoBehaviour
 {
     public int castleLife = 10;
-    public int castleLife2 = 10;
     [SerializeField] int damageDealt = 1;
 
     UI_Controller UI;
