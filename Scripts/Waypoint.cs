@@ -48,4 +48,11 @@ public class Waypoint : MonoBehaviour
         if (UI.isPlacerActive)
         FindObjectOfType<Placer>().placerMovement(this);
     }
+
+    private void RayToWaypoint()
+    {
+        Touch screenTouch = Input.GetTouch(0);
+        if (screenTouch.tapCount == 1)
+        Debug.Log(screenTouch.rawPosition);
+    }
 }

@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Advertisements;
 using UnityEngine.SceneManagement;
+
 
 public class UI_Controller : MonoBehaviour
 {
@@ -20,6 +22,7 @@ public class UI_Controller : MonoBehaviour
 
     public bool isPlacerActive = false;
     public Placer placerPrefab;
+    private Placer _placer;
 
     public float loseTimer = 15f;
     private castle castle;
@@ -62,17 +65,19 @@ public class UI_Controller : MonoBehaviour
         {
             if (isPlacerActive)
             return;
+
             else
             {
-            Placer _placer = Instantiate(placerPrefab, transform.position, Quaternion.identity);
+            _placer = Instantiate(placerPrefab, transform.position, Quaternion.identity);
             isPlacerActive = true;
 
             // _placer.towerGhost(towerType);
             }
         }
-        else
+        else 
         {
-            Destroy(FindObjectOfType<Placer>().gameObject);
+            if (isPlacerActive)
+            Destroy(_placer.gameObject);
             isPlacerActive = false;
         }
     }
@@ -113,7 +118,7 @@ public class UI_Controller : MonoBehaviour
     }
     private void CheckWIN()
     {
-        if (spawner.waveNum == 11 && spawner.start && spawner.transform.childCount == 0)
+        if (spawner.waveNum == 2 && spawner.start && spawner.transform.childCount == 0)
         {
         spawner.start = false;
         StopCoroutine(spawner.waveSpawner);
@@ -123,8 +128,8 @@ public class UI_Controller : MonoBehaviour
 
         endText.color = Color.green;
         endText.text = "YOU WIN!";
+
+
         }
     }
-
-    
 }
