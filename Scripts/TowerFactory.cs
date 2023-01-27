@@ -10,15 +10,17 @@ public class TowerFactory : MonoBehaviour
 
     [SerializeField] Image ChosedTowerImage;
     [SerializeField] Sprite[] TowerImages;
-    string towerType;
+    public string towerType;
 
     int TowerNum = 0;
     int TeslaTowerNum = 0;
     int FrostTowerNum = 0;
+    public int towerPrice;
 
     private void Start() 
     {
         Global_UI = FindObjectOfType<UI_Controller>();
+        towerType = "empty";
     }
     private void Update() 
     {
@@ -30,43 +32,61 @@ public class TowerFactory : MonoBehaviour
         chooseTower("FrostTower");
         if (Input.GetKeyDown(KeyCode.Escape))
         chooseTower("empty");
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Physics.Raycast(ray, out hit);
+            if (hit.transform.name == "Ground")
+            chooseTower("empty");
+            // else
+            // Debug.Log("NOT PLANE");
+        }
     }
+    // FindObjectOfType<TowerFactory>().AddTower(this);
     public void chooseTower(string _towerType)
     {
         if(_towerType == "Tower")
         {
             towerType = "Tower";
             ChosedTowerImage.sprite = TowerImages[1];
-            Global_UI.AddPlacer(true, towerType);
+            towerPrice = 2;
         }
         else if(_towerType == "TeslaTower")
         {
             towerType = "TeslaTower";
             ChosedTowerImage.sprite = TowerImages[2];
-            Global_UI.AddPlacer(true, towerType);
+            towerPrice = 5;
         }
         else if(_towerType == "FrostTower")
         {
             towerType = "FrostTower";
             ChosedTowerImage.sprite = TowerImages[3];
-            Global_UI.AddPlacer(true, towerType);
+            towerPrice = 4;
         }
         else if(_towerType == "empty")
         {
             towerType = "empty";
             ChosedTowerImage.sprite = TowerImages[0];
-            Global_UI.AddPlacer(false, null);
+            towerPrice = 0;
+            Global_UI.AddPlacer(false, null, null);
         }
 
     }
-    public void AddTower(Waypoint waypoint)
+    public void AddTower()
     {
-        if (towerType == "Tower")
+        if (towerType == "empty")
+        return;
+
+        Waypoint waypoint = FindObjectOfType<Placer>().currentWaypoint;
+        if (towerType == "Tower" && waypoint.isPlaceble && Global_UI.isPlacerActive)
         createTower(waypoint);
-        if (towerType == "TeslaTower")
+        if (towerType == "TeslaTower" && waypoint.isPlaceble && Global_UI.isPlacerActive)
         createTeslaTower(waypoint);
-        if (towerType == "FrostTower")
+        if (towerType == "FrostTower" && waypoint.isPlaceble && Global_UI.isPlacerActive)
         createFrostTower(waypoint);
+
+        Global_UI.AddPlacer(false, null, null);
     }
 
     private void createTower(Waypoint waypoint)

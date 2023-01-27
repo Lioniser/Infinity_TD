@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Advertisements;
 using UnityEngine.SceneManagement;
+using System;
+using System.Collections;
 
 
 public class UI_Controller : MonoBehaviour
@@ -11,6 +12,9 @@ public class UI_Controller : MonoBehaviour
     public Text life;
     public Text points;
     public Text coins;
+    public Text coins_info;
+    private float t_coins = 1f;
+    public bool isEnoughCoins;
     public Text endText;
     public Text lose_timer;
     public Button continue_btn;
@@ -27,11 +31,13 @@ public class UI_Controller : MonoBehaviour
     public float loseTimer = 15f;
     private castle castle;
     private EnemySpawner spawner;
+    private TowerFactory towerFactory;
 
     void Start()
     {
         castle = FindObjectOfType<castle>();
         spawner = FindObjectOfType<EnemySpawner>();
+        towerFactory = FindObjectOfType<TowerFactory>();
 
         points.text = pointsNum.ToString();
         coins.text =  "o " + totalCoins;
@@ -41,6 +47,9 @@ public class UI_Controller : MonoBehaviour
         CheckLOSE();
         CheckWIN();
         QuitLVL(false);
+
+        Clicked();
+        coinsText();
     }
 
     public void AddPointForKill()
@@ -50,7 +59,7 @@ public class UI_Controller : MonoBehaviour
     }
     public void AddCoinForKill()
     {
-        totalCoins = totalCoins + Mathf.RoundToInt(Random.Range(1f,3f));
+        totalCoins = totalCoins + Mathf.RoundToInt(UnityEngine.Random.Range(1f,3f));
         coins.text =  "o " + totalCoins;
     }
     public void AddCoin(int CoindToAdd)
@@ -59,7 +68,7 @@ public class UI_Controller : MonoBehaviour
         coins.text =  "o " + totalCoins;
     }
 
-    public void AddPlacer(bool Add, string towerType)
+    public void AddPlacer(bool Add, string towerType, Waypoint waypoint)
     {
         if (Add)
         {
@@ -68,7 +77,8 @@ public class UI_Controller : MonoBehaviour
 
             else
             {
-            _placer = Instantiate(placerPrefab, transform.position, Quaternion.identity);
+            _placer = Instantiate(placerPrefab, waypoint.transform.position, Quaternion.identity);
+            _placer.currentWaypoint = waypoint;
             isPlacerActive = true;
 
             // _placer.towerGhost(towerType);
@@ -118,7 +128,7 @@ public class UI_Controller : MonoBehaviour
     }
     private void CheckWIN()
     {
-        if (spawner.waveNum == 2 && spawner.start && spawner.transform.childCount == 0)
+        if (spawner.waveNum == 10 && spawner.start && spawner.transform.childCount == 0)
         {
         spawner.start = false;
         StopCoroutine(spawner.waveSpawner);
@@ -130,6 +140,67 @@ public class UI_Controller : MonoBehaviour
         endText.text = "YOU WIN!";
 
 
+        }
+    }
+
+    public void Clicked()
+    {
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Physics.Raycast(ray, out hit);
+        Waypoint waypoint = hit.transform.GetComponent<Waypoint>();
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (hit.transform.name == "BuildButton")
+            {
+                if (totalCoins >= towerFactory.towerPrice)
+                {
+                towerFactory.AddTower();
+                AddPlacer(false, null, null);
+                }
+                else
+                {
+                coins_info.text = "Not Enought Coins";
+                coins_info.color = Color.red;
+                isEnoughCoins = false;
+                }
+            }        
+            else if (towerFactory.towerType != "empty")
+            {
+                if (isPlacerActive)
+                {
+                    FindObjectOfType<Placer>().placerMovement(waypoint);
+                }
+                else
+                {
+                    if (waypoint.isPlaceble && !waypoint.towerHere)
+                    {
+                        AddPlacer(true, towerFactory.towerType, waypoint);
+                        FindObjectOfType<Placer>().placerMovement(waypoint);
+                    }
+                    else 
+                    {
+                    Debug.Log("Тут вже насрано");
+                    AddPlacer(true, towerFactory.towerType, waypoint);
+                    FindObjectOfType<Placer>().placerMovement(waypoint);
+                    }
+                }
+            }
+        }
+    }
+
+    private void coinsText()
+    {
+        if (isEnoughCoins == false && t_coins >= 0)
+        {
+            t_coins -= Time.deltaTime;
+            coins_info.color = new Color(coins_info.color.r, coins_info.color.g, coins_info.color.b, t_coins);
+        }
+        if (t_coins < 0)
+        {
+            t_coins = 1f;
+            isEnoughCoins = true;
         }
     }
 }

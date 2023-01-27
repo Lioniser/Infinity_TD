@@ -26,7 +26,6 @@ public class EnemyMovement : MonoBehaviour
     void Update()
     {
         transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime / (speed / 2));
-
     }
     
     IEnumerator enemyMove(List<Waypoint> path)

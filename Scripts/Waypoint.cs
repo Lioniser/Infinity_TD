@@ -13,11 +13,13 @@ public class Waypoint : MonoBehaviour
     public Waypoint checkFrom;
     public UI_Controller UI;
     private PathFinding pathFinding;
+    private TowerFactory towerFactory;
 
     private void Start() 
     {
         pathFinding = FindObjectOfType<PathFinding>();
         UI = FindObjectOfType<UI_Controller>();
+        towerFactory = FindObjectOfType<TowerFactory>();
     }
     public int GetGridSize(){
         return GridSize;
@@ -30,29 +32,5 @@ public class Waypoint : MonoBehaviour
         Mathf.RoundToInt(transform.position.x / GridSize),
         Mathf.RoundToInt(transform.position.z / GridSize)
         );
-    }
-    private void OnMouseOver()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (isPlaceble && !towerHere)
-            {
-                FindObjectOfType<TowerFactory>().AddTower(this);
-            }
-            else 
-            Debug.Log("Тут вже насрано");
-        }
-    }
-    private void OnMouseEnter() 
-    {
-        if (UI.isPlacerActive)
-        FindObjectOfType<Placer>().placerMovement(this);
-    }
-
-    private void RayToWaypoint()
-    {
-        Touch screenTouch = Input.GetTouch(0);
-        if (screenTouch.tapCount == 1)
-        Debug.Log(screenTouch.rawPosition);
     }
 }
