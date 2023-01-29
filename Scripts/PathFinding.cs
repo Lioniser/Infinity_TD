@@ -102,6 +102,7 @@ public class PathFinding : MonoBehaviour
     private void AddPointToPath(Waypoint pathPoint)
     {
         pathPoint.isPlaceble = false;
+        pathPoint.SetPathMat();
         path.Add(pathPoint);
     }
 }

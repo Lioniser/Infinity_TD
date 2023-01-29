@@ -21,7 +21,7 @@ public class EnemyDamage : MonoBehaviour
     [SerializeField] ParticleSystem castleDamageParticle;
     castle castle;
     UI_Controller UI;
-    Tower tower;
+    basicTower tower;
 
     [SerializeField] GameObject textDamage;
 
@@ -38,7 +38,7 @@ public class EnemyDamage : MonoBehaviour
     }
     private void OnParticleCollision(GameObject other)
     {
-        Tower _tower = other.GetComponentInParent<Tower>();
+        basicTower _tower = other.GetComponentInParent<basicTower>();
         getHit(_tower.Damage, _tower.CritChance);
     }
     private void destroyEnemy(ParticleSystem particles, bool isAdd)

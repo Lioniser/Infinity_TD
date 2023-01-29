@@ -3,58 +3,53 @@ using System.Collections;
 using System.Collections.Generic;
 
 [SelectionBase]
-public class Frost_tower : MonoBehaviour
+[RequireComponent(typeof(tower))]
+
+public class frostTower : MonoBehaviour
 {
     public ParticleSystem lvlUPParticle;
     public ParticleSystem frostEXParticle;
 
     UI_Controller Global_UI;
     [SerializeField] Transform enemyTarget;
-    [SerializeField] Transform Tmenu;
 
+    public int lvl = 1;
+    private int lvlUpPrice = 4;
     public TextMesh lvl_txt;
     public TextMesh lvlUP_price_txt;
-    public TextMesh dmg_txt;
-    public TextMesh spd_txt;
-    public TextMesh AOE_txt;
-    public TextMesh FrozenTime_txt;
-    public TextMesh FrozenMulti_txt;
-
-    private float _MenuCD = 5f;
-    private bool _MenuON = false;
+    
+    public tower tower;
     public Waypoint baseWaypoint;
-    float _t = 0f;
+    
 
+    public frostTowerUI characteristics;
+    // Базові характеристики
     public float shootRange;
     public float attackSpeed = 1f;
     public float Damage = 0.1f;
     public float CritChance = 1f; //10%
+    // Унікальні характеристики для вежі
     public float AreaOfEffect;
     public float FrozenMulti = 1.5f;
     public float FrozenTime = 1.5f;
-    public int lvl = 1;
-    
+    float _t = 0f;
+    private void Awake() 
+    {
+        characteristics = FindObjectOfType<frostTowerUI>();
+        tower = GetComponent<tower>();
+        enemyTarget = null;
+    }
     private void Start()
     {
-        enemyTarget = null;
         AreaOfEffect = shootRange - 5;
     }
-    void Update()
+    private void Update()
     {
         SetTargetEnemy();
         if (enemyTarget)
         {
             fire();
         }
-
-        UI_Opener();
-        UI_Timer();
-        UI_text_updater();
-    }
-
-    private void OnMouseOver() 
-    {
-        UI_On();
     }
     private void SetTargetEnemy()
     {
@@ -135,43 +130,59 @@ public class Frost_tower : MonoBehaviour
         _t = 0;
     }
 
-    public void UI_On()
+    public void Characteristic_text_updater()
     {
-        _MenuCD = 5f;
-        if (Input.GetKeyDown(KeyCode.Mouse0))
-        {
-            _MenuON = true;
-        }
+        characteristics.dmg_txt.text = "Damage:		" + Damage;
+        characteristics.spd_txt.text = "Attack speed:	" + attackSpeed;
+        characteristics.rng_txt.text = "Range:			" + shootRange;
+        characteristics.AOE_txt.text = "Area radius     " + AreaOfEffect;
+        characteristics.FrozenTime_txt.text = "Frost multi			" + FrozenTime;
+        characteristics.FrozenMulti_txt.text = "Frost time (sec)	" + FrozenMulti;
     }
-    private void UI_Timer()
+
+    public void lvlUp()
     {
-        if (_MenuON)
+        UI_Controller Global_UI = FindObjectOfType<UI_Controller>();
+        Transform Tmenu = GetComponent<tower>().Tmenu;
+        if (Input.GetKeyDown(KeyCode.Mouse0) && Global_UI.totalCoins >= lvlUpPrice && Tmenu.transform.localScale.x >= 1)
         {
-            _MenuCD -= Time.deltaTime;
-            if (_MenuCD <= 0)
+            Instantiate(lvlUPParticle.gameObject, transform.position, Quaternion.Euler(-90f,0f,0f));
+
+            lvl++;
+            lvl_txt.text = "LVL " + lvl;
+
+            Damage = Mathf.Round((Mathf.Sqrt(lvl * 0.1f + Damage)) * 10) / 10;
+
+            if (lvl%5 == 0)
+            attackSpeed = Mathf.Round(1.1f * attackSpeed * 10) / 10;
+
+            if (lvl%10 == 0)
             {
-                _MenuON = false; 
+            shootRange += 5;
+            AreaOfEffect += 5;
             }
+
+            if (lvl%3 == 0)
+            {
+            FrozenMulti = Mathf.Round((FrozenMulti * 1.3f) * 10) / 10f;    
+            FrozenTime = Mathf.Round((FrozenTime * 1.1f) * 10) / 10f;  
+            }
+
+            Characteristic_text_updater();
+            Global_UI.AddCoin(-lvlUpPrice);
+            CalculatelvlUpPrice();
+        }
+        if (Global_UI.totalCoins < lvlUpPrice && Tmenu.transform.localScale.x >= 1)
+        {
+            Global_UI.coins_info.text = "Not Enought Coins";
+            Global_UI.coins_info.color = Color.red;
+            Global_UI.isEnoughCoins = false;
         }
     }
-    private void UI_Opener()
+
+    private void CalculatelvlUpPrice()
     {
-        float _increase = Mathf.Lerp(Tmenu.transform.localScale.x, Tmenu.transform.localScale.x + 3, Time.deltaTime);
-        float _decrease = Mathf.Lerp(Tmenu.transform.localScale.x, Tmenu.transform.localScale.x - 4, Time.deltaTime);
-        if (_MenuON && Tmenu.transform.localScale.x <= 1)
-        Tmenu.transform.localScale = new Vector3 (_increase, _increase, _increase);
-        if (!_MenuON && Tmenu.transform.localScale.x >= 0)
-        Tmenu.transform.localScale = new Vector3 (_decrease, _decrease, _decrease);
-        if (!_MenuON && Tmenu.transform.localScale.x <= 0.1)
-        Tmenu.transform.localScale = new Vector3(0,0,0);
-    }
-    private void UI_text_updater()
-    {
-        lvl_txt.text = "LVL " + lvl;
-        dmg_txt.text = "DMG " + Damage;
-        spd_txt.text = "SPD " + attackSpeed;
-        AOE_txt.text = "AOE " + AreaOfEffect;
-        FrozenTime_txt.text = "Ft " + FrozenTime + "s";
-        FrozenMulti_txt.text = "Fm " + FrozenMulti;
+        lvlUpPrice = Mathf.RoundToInt(Mathf.Sqrt(lvl - 1) * 10f + lvlUpPrice);
+        lvlUP_price_txt.text = "o" + lvlUpPrice;
     }
 }

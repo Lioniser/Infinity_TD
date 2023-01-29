@@ -2,38 +2,43 @@ using UnityEngine;
 using System.Collections.Generic;
 
 [SelectionBase]
-public class Tesla_tower : MonoBehaviour
+[RequireComponent(typeof(tower))]
+
+public class teslaTower : MonoBehaviour
 {
     [SerializeField] Transform turretHead;
+    [SerializeField] Transform enemyTarget;
+
     [SerializeField] Light turretHeadLightning;
-    public float attackSpeed = 1f;
     [SerializeField] LightningBoltScript LightningAnimation;
     [SerializeField] LightningBoltScript LightningBolt;
 
     [SerializeField] float shootRange;
     public ParticleSystem lvlUPParticle;
 
-    [SerializeField] Transform enemyTarget;
-    [SerializeField] Transform Tmenu;
-
+    public int lvl = 1;
+    private int lvlUpPrice = 5;
     public TextMesh lvl_txt;
     public TextMesh lvlUP_price_txt;
-    public TextMesh dmg_txt;
-    public TextMesh spd_txt;
-    public TextMesh chn_txt;
 
-
-    private float _MenuCD = 5f;
-    private bool _MenuON = false;
     public Waypoint baseWaypoint;
+    public tower tower;
+
+    public teslaTowerUI characteristics;
     public float Damage = 1f;
     public float CritChance = 5f; //50%
+    public float attackSpeed = 1f;
     public int chainNums = 1;
-    public int lvl = 1;
-    
+
+    private void Awake() 
+    {
+        characteristics = FindObjectOfType<teslaTowerUI>();
+        tower = GetComponent<tower>();
+        enemyTarget = null;
+    }
     private void Start()
     {
-        enemyTarget = null;
+        lvlUP_price_txt.text = "o" + lvlUpPrice;
         LightningAnimation.StartObject = gameObject;
         LightningAnimation.EndObject = turretHead.gameObject;
     }
@@ -46,15 +51,6 @@ public class Tesla_tower : MonoBehaviour
         }
         else
         shoot(false);
-
-        UI_Opener();
-        UI_Timer();
-        UI_text_updater();
-    }
-
-    private void OnMouseOver() 
-    {
-        UI_On();
     }
     private void SetTargetEnemy()
     {
@@ -168,41 +164,48 @@ public class Tesla_tower : MonoBehaviour
         Destroy(_LightningBolt.gameObject, 0.2f);
     } 
 
-    public void UI_On()
+    public void Characteristic_text_updater()
     {
-        _MenuCD = 5f;
-        if (Input.GetKeyDown(KeyCode.Mouse0))
+        characteristics.dmg_txt.text = "Damage:		    " + Damage;
+        characteristics.spd_txt.text = "Attack speed:	" + attackSpeed;
+        characteristics.rng_txt.text = "Range:			" + shootRange;
+        characteristics.chn_txt.text = "Chains:			" + chainNums;
+    }
+
+    public void lvlUp()
+    {
+        UI_Controller Global_UI = FindObjectOfType<UI_Controller>();
+        Transform Tmenu = GetComponent<tower>().Tmenu;
+        if (Input.GetKeyDown(KeyCode.Mouse0) && Global_UI.totalCoins >= lvlUpPrice && Tmenu.transform.localScale.x >= 1)
         {
-            _MenuON = true;
+            Instantiate(lvlUPParticle.gameObject, transform.position, Quaternion.Euler(-90f,0f,0f));
+
+            lvl++;
+            lvl_txt.text = "LVL " + lvl;
+
+            Damage = Mathf.Round((Mathf.Sqrt(lvl + Damage)) * 10) / 10;
+
+            if (lvl%2 == 0)
+            attackSpeed = Mathf.Round(1.1f * attackSpeed * 10) / 10;
+
+            if (lvl%5 == 0)
+            chainNums++;
+
+            Characteristic_text_updater();
+            Global_UI.AddCoin(-lvlUpPrice);
+            CalculatelvlUpPrice();
+        }
+        if (Global_UI.totalCoins < lvlUpPrice && Tmenu.transform.localScale.x >= 1)
+        {
+            Global_UI.coins_info.text = "Not Enought Coins";
+            Global_UI.coins_info.color = Color.red;
+            Global_UI.isEnoughCoins = false;
         }
     }
-    private void UI_Timer()
+
+    private void CalculatelvlUpPrice()
     {
-        if (_MenuON)
-        {
-            _MenuCD -= Time.deltaTime;
-            if (_MenuCD <= 0)
-            {
-                _MenuON = false; 
-            }
-        }
-    }
-    private void UI_Opener()
-    {
-        float _increase = Mathf.Lerp(Tmenu.transform.localScale.x, Tmenu.transform.localScale.x + 3, Time.deltaTime);
-        float _decrease = Mathf.Lerp(Tmenu.transform.localScale.x, Tmenu.transform.localScale.x - 4, Time.deltaTime);
-        if (_MenuON && Tmenu.transform.localScale.x <= 1)
-        Tmenu.transform.localScale = new Vector3 (_increase, _increase, _increase);
-        if (!_MenuON && Tmenu.transform.localScale.x >= 0)
-        Tmenu.transform.localScale = new Vector3 (_decrease, _decrease, _decrease);
-        if (!_MenuON && Tmenu.transform.localScale.x <= 0.1)
-        Tmenu.transform.localScale = new Vector3(0,0,0);
-    }
-    private void UI_text_updater()
-    {
-        lvl_txt.text = "LVL " + lvl;
-        dmg_txt.text = "DMG " + Damage;
-        spd_txt.text = "SPD " + attackSpeed;
-        chn_txt.text = "CHN " + chainNums;
+        lvlUpPrice = Mathf.RoundToInt(Mathf.Sqrt(lvl - 1) * 5f + lvlUpPrice);
+        lvlUP_price_txt.text = "o" + lvlUpPrice;
     }
 }

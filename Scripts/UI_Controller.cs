@@ -15,6 +15,7 @@ public class UI_Controller : MonoBehaviour
     public Text coins_info;
     private float t_coins = 1f;
     public bool isEnoughCoins;
+
     public Text endText;
     public Text lose_timer;
     public Button continue_btn;
@@ -31,14 +32,25 @@ public class UI_Controller : MonoBehaviour
     public float loseTimer = 15f;
     private castle castle;
     private EnemySpawner spawner;
-    private TowerFactory towerFactory;
 
-    void Start()
+    private TowerFactory towerFactory;
+    private tower Anytower;
+
+    private float TimeToCloseUI = 10f;
+    [SerializeField] basicTowerUI basicTowerUI;
+    [SerializeField] teslaTowerUI teslaTowerUI;
+    [SerializeField] frostTowerUI frostTowerUI;
+
+    private void Awake() 
     {
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
         castle = FindObjectOfType<castle>();
         spawner = FindObjectOfType<EnemySpawner>();
         towerFactory = FindObjectOfType<TowerFactory>();
-
+    }
+    void Start()
+    {
         points.text = pointsNum.ToString();
         coins.text =  "o " + totalCoins;
     }
@@ -145,47 +157,75 @@ public class UI_Controller : MonoBehaviour
 
     public void Clicked()
     {
-        RaycastHit hit;
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        Physics.Raycast(ray, out hit);
-        Waypoint waypoint = hit.transform.GetComponent<Waypoint>();
-
         if (Input.GetMouseButtonDown(0))
         {
-            if (hit.transform.name == "BuildButton")
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Physics.Raycast(ray, out hit);
+            
+            if (hit.transform.GetComponent<Waypoint>())
             {
-                if (totalCoins >= towerFactory.towerPrice)
+                Waypoint waypoint = hit.transform.GetComponent<Waypoint>();     
+                if (towerFactory.towerType != "empty" && !waypoint.towerHere)
                 {
-                towerFactory.AddTower();
-                AddPlacer(false, null, null);
-                }
-                else
-                {
-                coins_info.text = "Not Enought Coins";
-                coins_info.color = Color.red;
-                isEnoughCoins = false;
-                }
-            }        
-            else if (towerFactory.towerType != "empty")
-            {
-                if (isPlacerActive)
-                {
-                    FindObjectOfType<Placer>().placerMovement(waypoint);
-                }
-                else
-                {
-                    if (waypoint.isPlaceble && !waypoint.towerHere)
+                    if (isPlacerActive)
+                    {
+                        FindObjectOfType<Placer>().placerMovement(waypoint);
+                    }
+                    else
                     {
                         AddPlacer(true, towerFactory.towerType, waypoint);
                         FindObjectOfType<Placer>().placerMovement(waypoint);
                     }
-                    else 
-                    {
-                    Debug.Log("Тут вже насрано");
-                    AddPlacer(true, towerFactory.towerType, waypoint);
-                    FindObjectOfType<Placer>().placerMovement(waypoint);
-                    }
                 }
+            }
+
+            if (hit.transform.name == "BuildButton")
+            {
+                if (totalCoins >= towerFactory.towerPrice)
+                {
+                    towerFactory.AddTower();
+                    AddPlacer(false, null, null);
+                }
+                else
+                {
+                    coins_info.text = "Not Enought Coins";
+                    coins_info.color = Color.red;
+                    isEnoughCoins = false;
+                }
+            }
+
+            if (hit.transform.name == "Ground")
+            closeAllUI();
+
+            if (hit.transform.GetComponent<basicTower>())
+            {
+                basicTower _basicTower = hit.transform.GetComponent<basicTower>();
+                closeOtherCharacteristics(_basicTower.tower.towerTypeParam);
+                _basicTower.characteristics.Char_UI_On(TimeToCloseUI);
+                _basicTower.tower.UI_On(TimeToCloseUI);
+                _basicTower.Characteristic_text_updater();
+                _basicTower.lvlUp();
+            }
+
+            if (hit.transform.GetComponent<teslaTower>())
+            {
+                teslaTower _teslaTower = hit.transform.GetComponent<teslaTower>();
+                closeOtherCharacteristics(_teslaTower.tower.towerTypeParam);
+                _teslaTower.characteristics.Char_UI_On(TimeToCloseUI);
+                _teslaTower.tower.UI_On(TimeToCloseUI);
+                _teslaTower.Characteristic_text_updater();
+                _teslaTower.lvlUp();
+            }
+
+            if (hit.transform.GetComponent<frostTower>())
+            {
+                frostTower _frostTower = hit.transform.GetComponent<frostTower>();
+                closeOtherCharacteristics(_frostTower.tower.towerTypeParam);
+                _frostTower.characteristics.Char_UI_On(TimeToCloseUI);
+                _frostTower.tower.UI_On(TimeToCloseUI);
+                _frostTower.Characteristic_text_updater();
+                _frostTower.lvlUp();
             }
         }
     }
@@ -202,5 +242,40 @@ public class UI_Controller : MonoBehaviour
             t_coins = 1f;
             isEnoughCoins = true;
         }
+    }
+
+    private void closeOtherCharacteristics(string towerType)
+    {
+        if (towerType == "Tower")
+        {
+            teslaTowerUI._MenuCD = 0f;
+            frostTowerUI._MenuCD = 0f;
+        }
+        if (towerType == "TeslaTower")
+        {
+            basicTowerUI._MenuCD = 0f;
+            frostTowerUI._MenuCD = 0f;
+        }
+        if (towerType == "FrostTower")
+        {
+            basicTowerUI._MenuCD = 0f;
+            teslaTowerUI._MenuCD = 0f;
+        }
+        if (towerType == "CloseAll")
+        {
+            basicTowerUI._MenuCD = 0f;
+            teslaTowerUI._MenuCD = 0f;
+            frostTowerUI._MenuCD = 0f;
+        }
+    }
+
+    private void closeAllUI()
+    {
+        tower[] alltowers = FindObjectsOfType<tower>();
+        foreach (tower CurrentTower in alltowers)
+        {
+            CurrentTower._MenuCD = 0;  
+        }
+        closeOtherCharacteristics("CloseAll");
     }
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 [SelectionBase]
 public class Waypoint : MonoBehaviour
@@ -11,17 +12,9 @@ public class Waypoint : MonoBehaviour
     public bool isPlaceble = true;
     public bool towerHere = false;
     public Waypoint checkFrom;
-    public UI_Controller UI;
-    private PathFinding pathFinding;
-    private TowerFactory towerFactory;
-
-    private void Start() 
+    
+    public int GetGridSize()
     {
-        pathFinding = FindObjectOfType<PathFinding>();
-        UI = FindObjectOfType<UI_Controller>();
-        towerFactory = FindObjectOfType<TowerFactory>();
-    }
-    public int GetGridSize(){
         return GridSize;
     }
 
@@ -32,5 +25,11 @@ public class Waypoint : MonoBehaviour
         Mathf.RoundToInt(transform.position.x / GridSize),
         Mathf.RoundToInt(transform.position.z / GridSize)
         );
+    }
+
+    public void SetPathMat()
+    {
+        transform.Find("Ground").gameObject.SetActive(false);
+        transform.Find("Ground_enemy").gameObject.SetActive(true);
     }
 }

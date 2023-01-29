@@ -5,7 +5,7 @@ using System.Collections;
 public class Ads : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
 {
     private string gameId = "5107427", type = "Interstitial_Android";
-    private bool testMode = true;
+    private bool testMode = false;
     private EnemySpawner spawner;
 
     private bool adsCompleted = false;
@@ -13,28 +13,26 @@ public class Ads : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
     private void Start() 
     {
         spawner = FindObjectOfType<EnemySpawner>();
-        ShowAd = ShowAdCourotine();
         Advertisement.Initialize(gameId, testMode, null);
     }
 
     private void Update() 
     {
-        if(Advertisement.isInitialized && spawner.waveNum % 2 == 0 && !adsCompleted)
+        if(Advertisement.isInitialized && spawner.waveNum % 3 == 0 && !adsCompleted)
         {
-            StartCoroutine(ShowAd);
-            Advertisement.Show(type, this);
-            OnUnityAdsShowComplete(type, UnityAdsShowCompletionState.SKIPPED);
-            OnUnityAdsShowComplete(type, UnityAdsShowCompletionState.COMPLETED);
+            StartCoroutine(ShowAdCoroutine());
+            adsCompleted = true;
+            // Debug.Log(adsCompleted);
         }
-        if(spawner.waveNum % 2 != 0)
+        if(spawner.waveNum % 3 != 0)
         adsCompleted = false;
-        
     }
-
-    IEnumerator ShowAdCourotine()
+    IEnumerator ShowAdCoroutine()
     {
         Advertisement.Load(type);
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(1f);
+        Advertisement.Show(type);
+        // Debug.Log(adsCompleted);
     }
 
     // Implement Load Listener and Show Listener interface methods: 
@@ -65,7 +63,7 @@ public class Ads : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
     }
     public void OnUnityAdsShowComplete(string type, UnityAdsShowCompletionState showCompletionState) 
     { 
-        adsCompleted = true;
+
     }
     public interface IUnityAdsLoadListener 
     {

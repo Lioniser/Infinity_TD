@@ -3,9 +3,9 @@ using UnityEngine.UI;
 
 public class TowerFactory : MonoBehaviour
 {
-    [SerializeField] Tower basic_towerToPlace;
-    [SerializeField] Tesla_tower tesla_towerToPlace;
-    [SerializeField] Frost_tower frost_towerToPlace;
+    [SerializeField] basicTower basic_towerToPlace;
+    [SerializeField] teslaTower tesla_towerToPlace;
+    [SerializeField] frostTower frost_towerToPlace;
     UI_Controller Global_UI;
 
     [SerializeField] Image ChosedTowerImage;
@@ -39,11 +39,8 @@ public class TowerFactory : MonoBehaviour
             Physics.Raycast(ray, out hit);
             if (hit.transform.name == "Ground")
             chooseTower("empty");
-            // else
-            // Debug.Log("NOT PLANE");
         }
     }
-    // FindObjectOfType<TowerFactory>().AddTower(this);
     public void chooseTower(string _towerType)
     {
         if(_towerType == "Tower")
@@ -80,21 +77,22 @@ public class TowerFactory : MonoBehaviour
 
         Waypoint waypoint = FindObjectOfType<Placer>().currentWaypoint;
         if (towerType == "Tower" && waypoint.isPlaceble && Global_UI.isPlacerActive)
-        createTower(waypoint);
+            createTower(waypoint, towerType);
         if (towerType == "TeslaTower" && waypoint.isPlaceble && Global_UI.isPlacerActive)
-        createTeslaTower(waypoint);
+            createTeslaTower(waypoint, towerType);
         if (towerType == "FrostTower" && waypoint.isPlaceble && Global_UI.isPlacerActive)
-        createFrostTower(waypoint);
+            createFrostTower(waypoint, towerType);
 
         Global_UI.AddPlacer(false, null, null);
     }
 
-    private void createTower(Waypoint waypoint)
+    private void createTower(Waypoint waypoint, string _towerType)
     {
         if (Global_UI.totalCoins >= 2)
         {
             TowerNum++;
-            Tower newTower = Instantiate(basic_towerToPlace, waypoint.transform.position, Quaternion.identity);
+            basicTower newTower = Instantiate(basic_towerToPlace, waypoint.transform.position, Quaternion.identity);
+            newTower.tower.towerTypeParam = _towerType;
             newTower.name = "Tower №" + TowerNum;
             newTower.transform.parent = transform;
             waypoint.towerHere = true;
@@ -104,12 +102,13 @@ public class TowerFactory : MonoBehaviour
         }
     }
 
-    private void createTeslaTower(Waypoint waypoint)
+    private void createTeslaTower(Waypoint waypoint, string _towerType)
     {
         if (Global_UI.totalCoins >= 5)
         {
             TeslaTowerNum++;
-            Tesla_tower newTower = Instantiate(tesla_towerToPlace, waypoint.transform.position, Quaternion.identity);
+            teslaTower newTower = Instantiate(tesla_towerToPlace, waypoint.transform.position, Quaternion.identity);
+            newTower.tower.towerTypeParam = _towerType;
             newTower.name = "Tesla Tower №" + TeslaTowerNum;
             newTower.transform.parent = transform;
             waypoint.towerHere = true;
@@ -119,12 +118,13 @@ public class TowerFactory : MonoBehaviour
         }
     }
 
-    private void createFrostTower(Waypoint waypoint)
+    private void createFrostTower(Waypoint waypoint, string _towerType)
     {
         if (Global_UI.totalCoins >= 4)
         {
             FrostTowerNum++;
-            Frost_tower newTower = Instantiate(frost_towerToPlace, waypoint.transform.position, Quaternion.identity);
+            frostTower newTower = Instantiate(frost_towerToPlace, waypoint.transform.position, Quaternion.identity);
+            newTower.tower.towerTypeParam = _towerType;
             newTower.name = "Frost Tower №" + FrostTowerNum;
             newTower.transform.parent = transform;
             waypoint.towerHere = true;
