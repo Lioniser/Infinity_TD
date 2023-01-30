@@ -2606,9 +2606,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Version: Alfa 0.030
+  m_Text: 'Version: Alfa 0.032
 
-    29.01.2023'
+    30.01.2023'
 --- !u!222 &617836572
 CanvasRenderer:
   m_ObjectHideFlags: 0

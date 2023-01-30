@@ -11,6 +11,7 @@ public class basicTower : MonoBehaviour
     [SerializeField] Transform enemyTarget;
 
     [SerializeField] float shootRange;
+    [SerializeField] ParticleSystem placeParticle;
     public ParticleSystem bulletParticle;
     public ParticleSystem lvlUPParticle;
 
@@ -35,6 +36,7 @@ public class basicTower : MonoBehaviour
     }
     private void Start()
     {
+        Instantiate(placeParticle, transform.position, Quaternion.Euler(-90f,0f,0f));
         lvlUP_price_txt.text = "o" + lvlUpPrice;
     }
     void Update()
@@ -105,7 +107,8 @@ public class basicTower : MonoBehaviour
     {
         UI_Controller Global_UI = FindObjectOfType<UI_Controller>();
         Transform Tmenu = GetComponent<tower>().Tmenu;
-        if (Input.GetKeyDown(KeyCode.Mouse0) && Global_UI.totalCoins >= lvlUpPrice && Tmenu.transform.localScale.x >= 1)
+
+        if (Global_UI.totalCoins >= lvlUpPrice && Tmenu.transform.localScale.x >= 1)
         {
             Instantiate(lvlUPParticle.gameObject, transform.position, Quaternion.Euler(-90f,0f,0f));
             lvl++;
@@ -120,12 +123,13 @@ public class basicTower : MonoBehaviour
             Global_UI.AddCoin(-lvlUpPrice);
             CalculatelvlUpPrice();
         }
-        if (Global_UI.totalCoins < lvlUpPrice && Tmenu.transform.localScale.x >= 1)
+        else if (Global_UI.totalCoins < lvlUpPrice && Tmenu.transform.localScale.x >= 1)
         {
             Global_UI.coins_info.text = "Not Enought Coins";
             Global_UI.coins_info.color = Color.red;
             Global_UI.isEnoughCoins = false;
         }
+        
     }
 
     private void CalculatelvlUpPrice()

@@ -743,14 +743,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   turretHead: {fileID: 5448402201696219187}
+  enemyTarget: {fileID: 0}
   turretHeadLightning: {fileID: 8112296160869206163}
-  attackSpeed: 1
   LightningAnimation: {fileID: 2629692212298907364}
   LightningBolt: {fileID: 7686760845630024897, guid: 40c290d31840cb34f9747bd5ce475f70, type: 3}
   shootRange: 25
+  placeParticle: {fileID: 2822374881837634637, guid: f6975a0c51472e343aebde6cfe17e1a8, type: 3}
   lvlUPParticle: {fileID: 2822374881837634637, guid: 6edde677540317c4286eab4be1622679, type: 3}
-  enemyTarget: {fileID: 0}
-  Tmenu: {fileID: 0}
+  lvl: 1
   lvl_txt: {fileID: 8238516715341309734}
   lvlUP_price_txt: {fileID: 6761834045420537122}
   baseWaypoint: {fileID: 0}
@@ -758,8 +758,8 @@ MonoBehaviour:
   characteristics: {fileID: 0}
   Damage: 1
   CritChance: 5
+  attackSpeed: 1
   chainNums: 1
-  lvl: 1
 --- !u!65 &4386025660902168908
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -793,6 +793,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12a38727196e79e42b7c6a6c809b6c53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  towerTypeParam: 
   Tmenu: {fileID: 92446662004438814}
   _MenuCD: 3
   _MenuON: 0

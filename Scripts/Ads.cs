@@ -30,7 +30,7 @@ public class Ads : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
     IEnumerator ShowAdCoroutine()
     {
         Advertisement.Load(type);
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(5f);
         Advertisement.Show(type);
         // Debug.Log(adsCompleted);
     }

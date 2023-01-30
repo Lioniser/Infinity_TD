@@ -14,6 +14,7 @@ public class teslaTower : MonoBehaviour
     [SerializeField] LightningBoltScript LightningBolt;
 
     [SerializeField] float shootRange;
+    [SerializeField] ParticleSystem placeParticle;
     public ParticleSystem lvlUPParticle;
 
     public int lvl = 1;
@@ -38,6 +39,7 @@ public class teslaTower : MonoBehaviour
     }
     private void Start()
     {
+        Instantiate(placeParticle, transform.position, Quaternion.Euler(-90f,0f,0f));
         lvlUP_price_txt.text = "o" + lvlUpPrice;
         LightningAnimation.StartObject = gameObject;
         LightningAnimation.EndObject = turretHead.gameObject;
@@ -166,7 +168,7 @@ public class teslaTower : MonoBehaviour
 
     public void Characteristic_text_updater()
     {
-        characteristics.dmg_txt.text = "Damage:		    " + Damage;
+        characteristics.dmg_txt.text = "Damage:		" + Damage;
         characteristics.spd_txt.text = "Attack speed:	" + attackSpeed;
         characteristics.rng_txt.text = "Range:			" + shootRange;
         characteristics.chn_txt.text = "Chains:			" + chainNums;
@@ -176,7 +178,7 @@ public class teslaTower : MonoBehaviour
     {
         UI_Controller Global_UI = FindObjectOfType<UI_Controller>();
         Transform Tmenu = GetComponent<tower>().Tmenu;
-        if (Input.GetKeyDown(KeyCode.Mouse0) && Global_UI.totalCoins >= lvlUpPrice && Tmenu.transform.localScale.x >= 1)
+        if (Global_UI.totalCoins >= lvlUpPrice && Tmenu.transform.localScale.x >= 1)
         {
             Instantiate(lvlUPParticle.gameObject, transform.position, Quaternion.Euler(-90f,0f,0f));
 
@@ -195,7 +197,7 @@ public class teslaTower : MonoBehaviour
             Global_UI.AddCoin(-lvlUpPrice);
             CalculatelvlUpPrice();
         }
-        if (Global_UI.totalCoins < lvlUpPrice && Tmenu.transform.localScale.x >= 1)
+        else if (Global_UI.totalCoins < lvlUpPrice && Tmenu.transform.localScale.x >= 1)
         {
             Global_UI.coins_info.text = "Not Enought Coins";
             Global_UI.coins_info.color = Color.red;

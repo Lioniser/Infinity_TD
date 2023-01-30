@@ -9,6 +9,7 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] EnemyMovement enemyPref;
     [SerializeField] AudioClip enemySpawnAudioFX;
     [SerializeField] UI_Controller UI;
+    [SerializeField] AudioSource AmbientMusic;
 
     public IEnumerator waveSpawner;
     int TotalEnemyNumber;
@@ -75,15 +76,16 @@ public class EnemySpawner : MonoBehaviour
     }
     public void StartSpawn()
     {
-        
         if (start && waveActive)
         return;
-        else if (start && !waveActive)
+
+        if (start && !waveActive)
         {
         StartCoroutine(waveSpawner);
         }
         else if (!start)
         {
+            AmbientMusic.Play();
             waveSpawner = waveSpawn();
             StartCoroutine(waveSpawner);
             start = true;

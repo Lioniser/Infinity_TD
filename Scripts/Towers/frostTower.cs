@@ -7,6 +7,7 @@ using System.Collections.Generic;
 
 public class frostTower : MonoBehaviour
 {
+    [SerializeField] ParticleSystem placeParticle;
     public ParticleSystem lvlUPParticle;
     public ParticleSystem frostEXParticle;
 
@@ -41,6 +42,7 @@ public class frostTower : MonoBehaviour
     }
     private void Start()
     {
+        Instantiate(placeParticle, transform.position, Quaternion.Euler(-90f,0f,0f));
         AreaOfEffect = shootRange - 5;
     }
     private void Update()
@@ -144,7 +146,7 @@ public class frostTower : MonoBehaviour
     {
         UI_Controller Global_UI = FindObjectOfType<UI_Controller>();
         Transform Tmenu = GetComponent<tower>().Tmenu;
-        if (Input.GetKeyDown(KeyCode.Mouse0) && Global_UI.totalCoins >= lvlUpPrice && Tmenu.transform.localScale.x >= 1)
+        if (Global_UI.totalCoins >= lvlUpPrice && Tmenu.transform.localScale.x >= 1)
         {
             Instantiate(lvlUPParticle.gameObject, transform.position, Quaternion.Euler(-90f,0f,0f));
 
@@ -172,7 +174,7 @@ public class frostTower : MonoBehaviour
             Global_UI.AddCoin(-lvlUpPrice);
             CalculatelvlUpPrice();
         }
-        if (Global_UI.totalCoins < lvlUpPrice && Tmenu.transform.localScale.x >= 1)
+        else if (Global_UI.totalCoins < lvlUpPrice && Tmenu.transform.localScale.x >= 1)
         {
             Global_UI.coins_info.text = "Not Enought Coins";
             Global_UI.coins_info.color = Color.red;

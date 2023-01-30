@@ -12,6 +12,9 @@ public class UI_Controller : MonoBehaviour
     public Text life;
     public Text points;
     public Text coins;
+    private bool isCoinAdded;
+    [SerializeField] Text coins_added;
+    private float disTime;
     public Text coins_info;
     private float t_coins = 1f;
     public bool isEnoughCoins;
@@ -61,7 +64,8 @@ public class UI_Controller : MonoBehaviour
         QuitLVL(false);
 
         Clicked();
-        coinsText();
+        CoinAddBlinker();
+        coinsText();  
     }
 
     public void AddPointForKill()
@@ -71,11 +75,31 @@ public class UI_Controller : MonoBehaviour
     }
     public void AddCoinForKill()
     {
-        totalCoins = totalCoins + Mathf.RoundToInt(UnityEngine.Random.Range(1f,3f));
+        isCoinAdded = true;
+        disTime = 1f;
+        coins_added.color = Color.yellow;
+
+        int CalculatedCoins = Mathf.RoundToInt(UnityEngine.Random.Range(1f,3f));
+        totalCoins += CalculatedCoins;
+        coins_added.text = "+" + CalculatedCoins;
         coins.text =  "o " + totalCoins;
     }
     public void AddCoin(int CoindToAdd)
     {
+        isCoinAdded = true;
+        disTime = 1f;
+        if (CoindToAdd < 0)
+        {
+            coins_added.color = Color.red;
+            coins_added.text = " " + CoindToAdd;
+        }
+        else
+        {
+            coins_added.color = Color.yellow;
+            coins_added.text = "+" + CoindToAdd;
+        }
+            
+
         totalCoins = totalCoins + CoindToAdd;
         coins.text =  "o " + totalCoins;
     }
@@ -277,5 +301,19 @@ public class UI_Controller : MonoBehaviour
             CurrentTower._MenuCD = 0;  
         }
         closeOtherCharacteristics("CloseAll");
+    }
+
+    private void CoinAddBlinker()
+    {
+        if (isCoinAdded)
+        {
+            disTime = disTime - Time.deltaTime;
+            coins_added.color = new Color(coins_added.color.r, coins_added.color.g, coins_added.color.b, disTime);
+        }
+        if (disTime < 0)
+        {
+            isCoinAdded = false;
+            disTime = 1f;
+        }
     }
 }
