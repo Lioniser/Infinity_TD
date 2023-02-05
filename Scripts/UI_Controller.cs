@@ -1,8 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using System;
-using System.Collections;
+using UnityEngine.EventSystems;
 
 
 public class UI_Controller : MonoBehaviour
@@ -17,7 +16,6 @@ public class UI_Controller : MonoBehaviour
     private float disTime;
     public Text coins_info;
     private float t_coins = 1f;
-    public bool isEnoughCoins;
 
     public Text endText;
     public Text lose_timer;
@@ -60,34 +58,32 @@ public class UI_Controller : MonoBehaviour
     void Update()
     {
         CheckLOSE();
-        CheckWIN();
         QuitLVL(false);
 
         Clicked();
-        CoinAddBlinker();
-        coinsText();  
+        CoinAddFader();
+        CoinsTextFader();  
     }
 
-    public void AddPointForKill()
+    public void AddPointForKill(int PointsToAdd)
     {
-        pointsNum++;
+        pointsNum += PointsToAdd;
         points.text = pointsNum.ToString();
     }
-    public void AddCoinForKill()
+    public void AddCoinForKill(int CoinToAdd)
     {
-        isCoinAdded = true;
         disTime = 1f;
         coins_added.color = Color.yellow;
 
-        int CalculatedCoins = Mathf.RoundToInt(UnityEngine.Random.Range(1f,3f));
+        int CalculatedCoins = Mathf.RoundToInt(UnityEngine.Random.Range(CoinToAdd, CoinToAdd * 2));
         totalCoins += CalculatedCoins;
         coins_added.text = "+" + CalculatedCoins;
         coins.text =  "o " + totalCoins;
     }
     public void AddCoin(int CoindToAdd)
     {
-        isCoinAdded = true;
         disTime = 1f;
+
         if (CoindToAdd < 0)
         {
             coins_added.color = Color.red;
@@ -98,7 +94,6 @@ public class UI_Controller : MonoBehaviour
             coins_added.color = Color.yellow;
             coins_added.text = "+" + CoindToAdd;
         }
-            
 
         totalCoins = totalCoins + CoindToAdd;
         coins.text =  "o " + totalCoins;
@@ -140,12 +135,12 @@ public class UI_Controller : MonoBehaviour
     }
     public void ContinueLVL()
     {
+        StartCoroutine(spawner.waveSpawn());
+        spawner.start = true;
+
         endText.text = " ";
         continue_btn.gameObject.SetActive(false);
         quit_btn.gameObject.SetActive(false);
-        
-        spawner.start = true;
-        StartCoroutine(spawner.waveSpawner);
     }
 
     private void CheckLOSE()
@@ -153,7 +148,6 @@ public class UI_Controller : MonoBehaviour
         if (castle.castleLife <= 0)
         {
             spawner.start = false;
-            StopCoroutine(spawner.waveSpawner);
 
             loseTimer -= Time.deltaTime;
 
@@ -162,20 +156,17 @@ public class UI_Controller : MonoBehaviour
             lose_timer.text = Mathf.RoundToInt(loseTimer).ToString();
         }
     }
-    private void CheckWIN()
+    public void CheckWIN()
     {
-        if (spawner.waveNum == 10 && spawner.start && spawner.transform.childCount == 0)
+        if (spawner.waveNum == 11 && spawner.start && spawner.transform.childCount == 0)
         {
         spawner.start = false;
-        StopCoroutine(spawner.waveSpawner);
-
+    
         continue_btn.gameObject.SetActive(true);
         quit_btn.gameObject.SetActive(true);
 
         endText.color = Color.green;
         endText.text = "YOU WIN!";
-
-
         }
     }
 
@@ -213,19 +204,18 @@ public class UI_Controller : MonoBehaviour
                 }
                 else
                 {
-                    coins_info.text = "Not Enought Coins";
-                    coins_info.color = Color.red;
-                    isEnoughCoins = false;
+                    
+                    t_coins = 1f;
                 }
             }
 
             if (hit.transform.name == "Ground")
-            closeAllUI();
+            CloseAllUI();
 
             if (hit.transform.GetComponent<basicTower>())
             {
                 basicTower _basicTower = hit.transform.GetComponent<basicTower>();
-                closeOtherCharacteristics(_basicTower.tower.towerTypeParam);
+                CloseOtherCharacteristics(_basicTower.tower.towerTypeParam);
                 _basicTower.characteristics.Char_UI_On(TimeToCloseUI);
                 _basicTower.tower.UI_On(TimeToCloseUI);
                 _basicTower.Characteristic_text_updater();
@@ -235,7 +225,7 @@ public class UI_Controller : MonoBehaviour
             if (hit.transform.GetComponent<teslaTower>())
             {
                 teslaTower _teslaTower = hit.transform.GetComponent<teslaTower>();
-                closeOtherCharacteristics(_teslaTower.tower.towerTypeParam);
+                CloseOtherCharacteristics(_teslaTower.tower.towerTypeParam);
                 _teslaTower.characteristics.Char_UI_On(TimeToCloseUI);
                 _teslaTower.tower.UI_On(TimeToCloseUI);
                 _teslaTower.Characteristic_text_updater();
@@ -245,7 +235,7 @@ public class UI_Controller : MonoBehaviour
             if (hit.transform.GetComponent<frostTower>())
             {
                 frostTower _frostTower = hit.transform.GetComponent<frostTower>();
-                closeOtherCharacteristics(_frostTower.tower.towerTypeParam);
+                CloseOtherCharacteristics(_frostTower.tower.towerTypeParam);
                 _frostTower.characteristics.Char_UI_On(TimeToCloseUI);
                 _frostTower.tower.UI_On(TimeToCloseUI);
                 _frostTower.Characteristic_text_updater();
@@ -253,22 +243,37 @@ public class UI_Controller : MonoBehaviour
             }
         }
     }
-
-    private void coinsText()
+    public void CoinsErrorMessage(string text, Color color)
+        {
+            coins_info.text = text;
+            coins_info.color = color;
+            t_coins = 1f;
+        }
+    private void CoinsTextFader()
     {
-        if (isEnoughCoins == false && t_coins >= 0)
+        if (t_coins > 0)
         {
             t_coins -= Time.deltaTime;
             coins_info.color = new Color(coins_info.color.r, coins_info.color.g, coins_info.color.b, t_coins);
         }
-        if (t_coins < 0)
+        else if (t_coins < 0)
         {
-            t_coins = 1f;
-            isEnoughCoins = true;
+            t_coins = 0f;
         }
     }
-
-    private void closeOtherCharacteristics(string towerType)
+    private void CoinAddFader()
+    {
+        if (disTime > 0)
+        {
+            disTime = disTime - Time.deltaTime;
+            coins_added.color = new Color(coins_added.color.r, coins_added.color.g, coins_added.color.b, disTime);
+        }
+        else if (disTime < 0)
+        {
+            disTime = 0f;
+        }
+    }
+    private void CloseOtherCharacteristics(string towerType)
     {
         if (towerType == "Tower")
         {
@@ -293,27 +298,15 @@ public class UI_Controller : MonoBehaviour
         }
     }
 
-    private void closeAllUI()
+    private void CloseAllUI()
     {
         tower[] alltowers = FindObjectsOfType<tower>();
         foreach (tower CurrentTower in alltowers)
         {
             CurrentTower._MenuCD = 0;  
         }
-        closeOtherCharacteristics("CloseAll");
+        CloseOtherCharacteristics("CloseAll");
     }
 
-    private void CoinAddBlinker()
-    {
-        if (isCoinAdded)
-        {
-            disTime = disTime - Time.deltaTime;
-            coins_added.color = new Color(coins_added.color.r, coins_added.color.g, coins_added.color.b, disTime);
-        }
-        if (disTime < 0)
-        {
-            isCoinAdded = false;
-            disTime = 1f;
-        }
-    }
+    
 }

@@ -757,7 +757,7 @@ MonoBehaviour:
   tower: {fileID: 0}
   characteristics: {fileID: 0}
   Damage: 1
-  CritChance: 5
+  CritChance: 0
   attackSpeed: 1
   chainNums: 1
 --- !u!65 &4386025660902168908

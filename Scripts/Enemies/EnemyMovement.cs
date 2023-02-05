@@ -8,18 +8,21 @@ public class EnemyMovement : MonoBehaviour
 
     private PathFinding pathfinder;
     private EnemyDamage damage;
-    public float speed = 1f;
+    public float speed;
 
     castle castle;
     Vector3 startPos;
     Vector3 targetPos;
     List<Waypoint> path;
-    void Start()
+    private void Awake() 
     {
         castle = FindObjectOfType<castle>();
         pathfinder = FindObjectOfType<PathFinding>();
         damage = GetComponent<EnemyDamage>();
-
+    }
+    void Start()
+    {
+        speed = damage.enemy.speed;
         path = pathfinder.setPath();
         StartCoroutine(enemyMove(path));
     }
@@ -31,13 +34,13 @@ public class EnemyMovement : MonoBehaviour
     IEnumerator enemyMove(List<Waypoint> path)
     {
         foreach (Waypoint waypoint in path)
-        {
+        { 
             transform.LookAt(waypoint.transform);
             targetPos = waypoint.transform.position;
             yield return new WaitForSeconds(speed);
         }
-        damage.CastleDamager();
-        castle.CastleDamage();
+        damage.DestroyEnemy(false);
+        castle.CastleDamage(GetComponent<Enemy>().pointsCost);
     }
 
     public void Freeze(float _frozenMultiplayer, float _FrozenTime)

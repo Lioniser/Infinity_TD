@@ -5,7 +5,6 @@ using UnityEngine.UI;
 public class castle : MonoBehaviour
 {
     public int castleLife = 10;
-    [SerializeField] int damageDealt = 1;
 
     UI_Controller UI;
     
@@ -14,11 +13,11 @@ public class castle : MonoBehaviour
         UI = FindObjectOfType<UI_Controller>();
         UI.life.text = "Life: " + castleLife;
     }
-    public void CastleDamage()
+    public void CastleDamage(int Damage)
     {
         if (castleLife > 0)
             {
-                castleLife -= damageDealt;
+                castleLife -= Damage;
                 UI.life.text = "Life: " + castleLife;
             }
     }

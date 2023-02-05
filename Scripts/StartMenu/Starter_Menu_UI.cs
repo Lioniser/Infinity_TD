@@ -6,6 +6,7 @@ public class Starter_Menu_UI : MonoBehaviour
 {
     [SerializeField] Text hint_text;
     float timer;
+    public int TestInt {get; set;}
     void Start()
     {
         Hints();

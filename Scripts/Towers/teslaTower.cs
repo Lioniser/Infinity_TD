@@ -27,7 +27,7 @@ public class teslaTower : MonoBehaviour
 
     public teslaTowerUI characteristics;
     public float Damage = 1f;
-    public float CritChance = 5f; //50%
+    public float CritChance = 5f; //5%
     public float attackSpeed = 1f;
     public int chainNums = 1;
 
@@ -155,7 +155,7 @@ public class teslaTower : MonoBehaviour
     }
     private void generateBolt(GameObject firstObj, GameObject secondObj)
     {
-        secondObj.GetComponent<EnemyDamage>().getHit(Damage, CritChance);
+        secondObj.GetComponent<EnemyDamage>().GetHit(Damage, CritChance);
 
         LightningBoltScript _LightningBolt = Instantiate(LightningBolt, firstObj.transform);
         _LightningBolt.transform.parent = transform;
@@ -199,9 +199,7 @@ public class teslaTower : MonoBehaviour
         }
         else if (Global_UI.totalCoins < lvlUpPrice && Tmenu.transform.localScale.x >= 1)
         {
-            Global_UI.coins_info.text = "Not Enought Coins";
-            Global_UI.coins_info.color = Color.red;
-            Global_UI.isEnoughCoins = false;
+            Global_UI.CoinsErrorMessage("Not Enough Coins", Color.red);
         }
     }
 

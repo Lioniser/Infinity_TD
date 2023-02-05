@@ -23,8 +23,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2433325988931350650}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.44, y: 9.5, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.37, y: 9.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -43,7 +43,6 @@ GameObject:
   - component: {fileID: 6676502056528521377}
   - component: {fileID: 6979823938411627283}
   - component: {fileID: 5338018033284776925}
-  - component: {fileID: 883191079457910939}
   m_Layer: 0
   m_Name: HP Bar
   m_TagString: Untagged
@@ -116,19 +115,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &883191079457910939
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5427059193184678638}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5609537356964639817
 GameObject:
   m_ObjectHideFlags: 0
@@ -143,8 +129,9 @@ GameObject:
   - component: {fileID: 144256522048335186}
   - component: {fileID: 800459921339145147}
   - component: {fileID: 3887671895979210042}
+  - component: {fileID: 3435890311736292984}
   m_Layer: 2
-  m_Name: Enemy
+  m_Name: Monster
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -167,7 +154,7 @@ Transform:
   - {fileID: 3868008824134976994}
   - {fileID: 6072548238426881000}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1994463469
 MonoBehaviour:
@@ -182,7 +169,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isFrozen: 0
-  speed: 1
+  speed: 0
 --- !u!54 &886679634
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -190,10 +177,21 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5609537356964639817}
-  serializedVersion: 2
+  serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 1
   m_Interpolate: 0
@@ -207,9 +205,17 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5609537356964639817}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Size: {x: 4, y: 6, z: 4}
   m_Center: {x: 0, y: 3, z: 0}
 --- !u!114 &800459921339145147
@@ -224,16 +230,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fab57fa6c7bc684ca0d900afffe2441, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyHealth: 10
-  StatusBar: {fileID: 5673814906032326106}
-  Health: {fileID: 2433325988931350650}
-  Frost: {fileID: 9185387107968171743}
+  enemy: {fileID: 0}
+  statusBarObj: {fileID: 5673814906032326106}
+  healthObj: {fileID: 2433325988931350650}
+  frostedObj: {fileID: 9185387107968171743}
   hitParticle: {fileID: 3990566859261207584}
-  HitDamageAudioFX: {fileID: 8300000, guid: e2a7b698dd33eef4398f7d2ac91435d1, type: 3}
+  hitAudio: {fileID: 8300000, guid: e2a7b698dd33eef4398f7d2ac91435d1, type: 3}
   deathParticle: {fileID: 198537984209914932, guid: 1a51bfda454239a41afb7dee687c6ac0, type: 3}
-  DeathEnemyAudioFX: {fileID: 8300000, guid: 80bb710d8a8a2b342855c4e7f258075d, type: 3}
-  castleDamageParticle: {fileID: 198537984209914932, guid: 3f8ba0e01c613dc4c82f887158419dee, type: 3}
-  textDamage: {fileID: 5194370373466677100, guid: f03ca2ddf103c2543aa35af8eb08a82b, type: 3}
+  deathParticleCastle: {fileID: 198537984209914932, guid: 3f8ba0e01c613dc4c82f887158419dee, type: 3}
+  deathAudio: {fileID: 8300000, guid: 80bb710d8a8a2b342855c4e7f258075d, type: 3}
+  textDamage: {fileID: 7928072706700025547, guid: f03ca2ddf103c2543aa35af8eb08a82b, type: 3}
 --- !u!82 &3887671895979210042
 AudioSource:
   m_ObjectHideFlags: 0
@@ -330,6 +336,31 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &3435890311736292984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5609537356964639817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9bad998d5aff7e47999860d191ccdf5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: Monster
+  modification: Basic
+  rarity: 0
+  enemyBaseRend: {fileID: 2430265454494661379}
+  materials:
+  - {fileID: 2100000, guid: b15f8bd41b5620f4b8956aaa0f379d4f, type: 2}
+  - {fileID: 2100000, guid: 995ea0f298aef2841ae19a5a2d3deabc, type: 2}
+  - {fileID: 2100000, guid: 3fd63b13e5f66ff4696102cbe9521567, type: 2}
+  life: 10
+  lifeRegen: 0
+  speed: 1
+  coinCost: 1
+  pointsCost: 1
 --- !u!1 &5673814906032326106
 GameObject:
   m_ObjectHideFlags: 0
@@ -455,9 +486,17 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9185387107968171743}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1613380627585379111
@@ -465,7 +504,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 6432350598019638091}
     m_Modifications:
     - target: {fileID: 3326891093629767162, guid: e26d6849b189e2846986fa1d9ef67f01, type: 3}
@@ -512,13 +551,24 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4024503584639389732, guid: e26d6849b189e2846986fa1d9ef67f01, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: db3374eff939ea44cae13b9d88936d7b, type: 2}
     - target: {fileID: 5808889996688006849, guid: e26d6849b189e2846986fa1d9ef67f01, type: 3}
       propertyPath: m_Name
       value: Enemy_body
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e26d6849b189e2846986fa1d9ef67f01, type: 3}
+--- !u!23 &2430265454494661379 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 4024503584639389732, guid: e26d6849b189e2846986fa1d9ef67f01, type: 3}
+  m_PrefabInstance: {fileID: 1613380627585379111}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4055664033155491549 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3326891093629767162, guid: e26d6849b189e2846986fa1d9ef67f01, type: 3}
@@ -529,7 +579,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 6432350598019638091}
     m_Modifications:
     - target: {fileID: 1505610324796538, guid: dcf9cd10c07cf0c49863969befadb243, type: 3}
@@ -581,7 +631,9 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dcf9cd10c07cf0c49863969befadb243, type: 3}
 --- !u!4 &3868008824134976994 stripped
 Transform:
@@ -598,7 +650,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 6432350598019638091}
     m_Modifications:
     - target: {fileID: 8775081445952566657, guid: a64187ef98c4afa4ea37d65c4a49781f, type: 3}
@@ -650,7 +702,9 @@ PrefabInstance:
       value: Enemy Move Particles
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a64187ef98c4afa4ea37d65c4a49781f, type: 3}
 --- !u!4 &3382155196221052586 stripped
 Transform:

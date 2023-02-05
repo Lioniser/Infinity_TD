@@ -26,7 +26,7 @@ public class basicTower : MonoBehaviour
     public basicTowerUI characteristics;
     //Базові характеристики
     public float Damage = 1f;
-    public float CritChance = 3f; //30%
+    public float CritChance = 30f; //30%
 
     private void Awake() 
     {
@@ -76,20 +76,20 @@ public class basicTower : MonoBehaviour
     }
 
     private void fire()
+    {
+        
+        float distanceToEnemy = Vector3.Distance(enemyTarget.transform.position, transform.position);
+        if (distanceToEnemy <= shootRange)
         {
-            
-            float distanceToEnemy = Vector3.Distance(enemyTarget.transform.position, transform.position);
-            if (distanceToEnemy <= shootRange)
-            {
-            turretHead.LookAt(enemyTarget.transform);
-            shoot(true);
-            }
-            else
-            {
-            shoot(false);
-            turretHead.transform.rotation = new Quaternion(0f,0f,0f,0f);
-            }
+        turretHead.LookAt(enemyTarget.transform);
+        shoot(true);
         }
+        else
+        {
+        shoot(false);
+        turretHead.transform.rotation = new Quaternion(0f,0f,0f,0f);
+        }
+    }
     private void shoot(bool isActive)
     {
         var emission = bulletParticle.emission;
@@ -125,9 +125,7 @@ public class basicTower : MonoBehaviour
         }
         else if (Global_UI.totalCoins < lvlUpPrice && Tmenu.transform.localScale.x >= 1)
         {
-            Global_UI.coins_info.text = "Not Enought Coins";
-            Global_UI.coins_info.color = Color.red;
-            Global_UI.isEnoughCoins = false;
+            Global_UI.CoinsErrorMessage("Not Enough Coins", Color.red);
         }
         
     }

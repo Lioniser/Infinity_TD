@@ -28,7 +28,7 @@ public class frostTower : MonoBehaviour
     public float shootRange;
     public float attackSpeed = 1f;
     public float Damage = 0.1f;
-    public float CritChance = 1f; //10%
+    public float CritChance = 10f; //10%
     // Унікальні характеристики для вежі
     public float AreaOfEffect;
     public float FrozenMulti = 1.5f;
@@ -44,6 +44,7 @@ public class frostTower : MonoBehaviour
     {
         Instantiate(placeParticle, transform.position, Quaternion.Euler(-90f,0f,0f));
         AreaOfEffect = shootRange - 5;
+        lvlUP_price_txt.text = "o" + lvlUpPrice;
     }
     private void Update()
     {
@@ -96,7 +97,7 @@ public class frostTower : MonoBehaviour
             
                 for (int i = 0; i < NearEnemies.Count; i++)
                 {
-                    NearEnemies[i].GetComponent<EnemyDamage>().getHit(Damage,CritChance);
+                    NearEnemies[i].GetComponent<EnemyDamage>().GetHit(Damage,CritChance);
                     if (NearEnemies[i].isFrozen)
                     continue;
                     NearEnemies[i].Freeze(FrozenMulti, FrozenTime);
@@ -176,9 +177,7 @@ public class frostTower : MonoBehaviour
         }
         else if (Global_UI.totalCoins < lvlUpPrice && Tmenu.transform.localScale.x >= 1)
         {
-            Global_UI.coins_info.text = "Not Enought Coins";
-            Global_UI.coins_info.color = Color.red;
-            Global_UI.isEnoughCoins = false;
+            Global_UI.CoinsErrorMessage("Not Enough Coins", Color.red);
         }
     }
 
