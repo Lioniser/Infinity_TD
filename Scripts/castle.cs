@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class castle : MonoBehaviour
 {
-    public int castleLife = 10;
+    public int castleLife = 30;
 
     UI_Controller UI;
     
@@ -18,6 +18,8 @@ public class castle : MonoBehaviour
         if (castleLife > 0)
             {
                 castleLife -= Damage;
+                if (castleLife < 0)
+                    castleLife = 0;
                 UI.life.text = "Life: " + castleLife;
             }
     }

@@ -112,7 +112,7 @@ public class EnemyDamage : MonoBehaviour
         text.color = textColor;
         text.transform.LookAt(Camera.main.transform.position);
         text.text = damage.ToString();
-        Destroy(text, 0.4f);
+        Destroy(text.gameObject, 0.4f);
     }
     private void HealthBarUpdater()
     {

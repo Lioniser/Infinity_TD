@@ -18,13 +18,13 @@ public class Ads : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
 
     private void Update() 
     {
-        if(Advertisement.isInitialized && spawner.waveNum % 4 == 0 && !adsCompleted)
+        if(Advertisement.isInitialized && spawner.waveNum % 5 == 0 && !adsCompleted)
         {
             StartCoroutine(ShowAdCoroutine());
             adsCompleted = true;
             // Debug.Log(adsCompleted);
         }
-        if(spawner.waveNum % 4 != 0)
+        if(spawner.waveNum % 5 != 0)
         adsCompleted = false;
     }
     IEnumerator ShowAdCoroutine()

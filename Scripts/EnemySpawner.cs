@@ -29,8 +29,11 @@ public class EnemySpawner : MonoBehaviour
     {
         UI.CheckWIN();
 
-        if (transform.childCount == 0 && start)
-        isTimerOn = true;
+        if (transform.childCount == 0 && start && !isTimerOn)
+        {
+            WaveSaver();
+            isTimerOn = true;
+        }
 
         WaveTimer();
         WaveStartedText();
@@ -38,17 +41,17 @@ public class EnemySpawner : MonoBehaviour
     private IEnumerator enemySpawn()
     {
         UI.WaveStarted.text = "Wave Started";
-
+    
         for (int i = 1; i <= mobNumberInWave; i++)
         {
-            // if (waveNum <= 10)
-            // {
+            if (waveNum <= 10)
+            {
                 if (i == mobNumberInWave && waveNum % 5 == 0)
                 {
                     TotalEnemyNumber++;
                     GetComponent<AudioSource>().PlayOneShot(bossSpawnAudioFX);
                     Enemy boss = Instantiate(bossPref, transform.position, Quaternion.Euler(0f,90f,0f));
-                    boss.RollMonster("Boss");
+                    boss.RollMonster("Boss", waveNum);
                     boss.name = "Boss: #" + TotalEnemyNumber;
                     boss.transform.parent = transform;
                 }
@@ -57,24 +60,66 @@ public class EnemySpawner : MonoBehaviour
                     TotalEnemyNumber++;
                     GetComponent<AudioSource>().PlayOneShot(enemySpawnAudioFX);
                     Enemy enemy = Instantiate(enemyPref, transform.position, Quaternion.Euler(0f,90f,0f));
-                    enemy.RollMonster("Monster");
+                    enemy.RollMonster("Monster", waveNum);
                     enemy.name = "Monster: #" + TotalEnemyNumber;
                     enemy.transform.parent = transform;
                 }
-            // }
+            }
+            else
+            {
+                int randomBossCount = Mathf.RoundToInt(Random.Range(1f, mobNumberInWave));
+                if (i < randomBossCount && waveNum % 5 == 0 && waveNum < 20)
+                {
+                    TotalEnemyNumber++;
+                    GetComponent<AudioSource>().PlayOneShot(bossSpawnAudioFX);
+                    Enemy boss = Instantiate(bossPref, transform.position, Quaternion.Euler(0f,90f,0f));
+                    boss.RollMonster("Boss", waveNum);
+                    boss.name = "Boss: #" + TotalEnemyNumber;
+                    boss.transform.parent = transform;
+                }
+                else if (i < randomBossCount + (waveNum - 20) && waveNum % 5 != 0 && waveNum < 20)
+                {
+                    TotalEnemyNumber++;
+                    GetComponent<AudioSource>().PlayOneShot(bossSpawnAudioFX);
+                    Enemy boss = Instantiate(bossPref, transform.position, Quaternion.Euler(0f,90f,0f));
+                    boss.RollMonster("Boss", waveNum);
+                    boss.name = "Boss: #" + TotalEnemyNumber;
+                    boss.transform.parent = transform;
+                }
+                else if (i < randomBossCount + (waveNum - 10) && waveNum >= 20)
+                {
+                    TotalEnemyNumber++;
+                    GetComponent<AudioSource>().PlayOneShot(bossSpawnAudioFX);
+                    Enemy boss = Instantiate(bossPref, transform.position, Quaternion.Euler(0f,90f,0f));
+                    boss.RollMonster("Boss", waveNum);
+                    boss.name = "Boss: #" + TotalEnemyNumber;
+                    boss.transform.parent = transform;
+                }
+                else
+                {
+                    TotalEnemyNumber++;
+                    GetComponent<AudioSource>().PlayOneShot(enemySpawnAudioFX);
+                    Enemy enemy = Instantiate(enemyPref, transform.position, Quaternion.Euler(0f,90f,0f));
+                    enemy.RollMonster("Monster", waveNum);
+                    enemy.name = "Monster: #" + TotalEnemyNumber;
+                    enemy.transform.parent = transform;
+                }
+            }
             yield return new WaitForSeconds(spawnTime);
         }
-        // spawnTime = Mathf.Round((Mathf.Sqrt(waveNum) / waveNum)*100)/100;
-
         //Зміни у хвилях
-        mobNumberInWave = mobNumberInWave + 2;
+        mobNumberInWave += 2;
         if (waveNum%4 == 0)
         {
-            mobNumberInWave = mobNumberInWave + 5;
+            mobNumberInWave += 5;
         }
         if (waveNum%2 == 0)
         {
-            spawnTime = spawnTime * 0.8f;;
+            spawnTime = spawnTime * 0.9f;;
+        }
+        if (waveNum%3 == 0)
+        {
+            mobNumberInWave -= 5;
             spawnProbability++;
         }
     }
@@ -87,6 +132,32 @@ public class EnemySpawner : MonoBehaviour
         //Наступна хвиля
         waveNum++;
         waveTime = 10f * waveNum / 2;
+    }
+
+    private void WaveSaver()
+    {
+        
+        switch (UI.mapLevel)
+        {
+            case 1:
+            {
+                if (waveNum - 1 > PlayerPrefs.GetInt("planes"))
+                    PlayerPrefs.SetInt("planes", waveNum - 1);
+                break;
+            }
+            case 2:
+            {
+                if (waveNum - 1 > PlayerPrefs.GetInt("lakes"))
+                    PlayerPrefs.SetInt("lakes", waveNum - 1);
+                break;
+            } 
+            case 3:
+            {
+                if (waveNum - 1 > PlayerPrefs.GetInt("forest"))
+                    PlayerPrefs.SetInt("forest", waveNum - 1);
+                break;
+            } 
+        }
     }
     public void StartSpawn()
     {

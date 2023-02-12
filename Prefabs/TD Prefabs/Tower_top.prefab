@@ -89,9 +89,13 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 6955704362454442526}
     m_Modifications:
+    - target: {fileID: 8579808742952148787, guid: 860b5fff912988d4fbc48cc05bd8736a, type: 3}
+      propertyPath: ShapeModule.angle
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8579808742952148787, guid: 860b5fff912988d4fbc48cc05bd8736a, type: 3}
       propertyPath: LightsModule.color
       value: 0
@@ -119,6 +123,10 @@ PrefabInstance:
     - target: {fileID: 8579808742952148787, guid: 860b5fff912988d4fbc48cc05bd8736a, type: 3}
       propertyPath: SizeModule.curve.scalar
       value: 3.3702283
+      objectReference: {fileID: 0}
+    - target: {fileID: 8579808742952148787, guid: 860b5fff912988d4fbc48cc05bd8736a, type: 3}
+      propertyPath: ShapeModule.radius.value
+      value: 0.0001
       objectReference: {fileID: 0}
     - target: {fileID: 8579808742952148787, guid: 860b5fff912988d4fbc48cc05bd8736a, type: 3}
       propertyPath: CollisionModule.minKillSpeed
@@ -198,7 +206,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8579808742952148789, guid: 860b5fff912988d4fbc48cc05bd8736a, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.565
+      value: 0.686
       objectReference: {fileID: 0}
     - target: {fileID: 8579808742952148789, guid: 860b5fff912988d4fbc48cc05bd8736a, type: 3}
       propertyPath: m_LocalRotation.w
@@ -233,7 +241,9 @@ PrefabInstance:
       value: BulletShot
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 860b5fff912988d4fbc48cc05bd8736a, type: 3}
 --- !u!4 &5721247719239016273 stripped
 Transform:

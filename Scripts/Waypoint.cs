@@ -10,6 +10,7 @@ public class Waypoint : MonoBehaviour
     public bool startCheck = false;
     public bool endCheck = false;
     public bool isPlaceble = true;
+    public bool canBePath = true;
     public bool towerHere = false;
     public Waypoint checkFrom;
     
@@ -29,7 +30,7 @@ public class Waypoint : MonoBehaviour
 
     public void SetPathMat()
     {
-        transform.Find("Ground").gameObject.SetActive(false);
-        transform.Find("Ground_enemy").gameObject.SetActive(true);
+        transform.Find("baseBlock").gameObject.SetActive(false);
+        transform.Find("corruptedBlock").gameObject.SetActive(true);
     }
 }

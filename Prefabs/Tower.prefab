@@ -24,7 +24,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1328676028712547909}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 2.21}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -60,7 +60,7 @@ Transform:
   m_GameObject: {fileID: 2493381324894597095}
   m_LocalRotation: {x: 0.7071066, y: -0, z: -0, w: 0.70710707}
   m_LocalPosition: {x: -0.6, y: 0, z: -1.99}
-  m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
+  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 541288237849509521}
@@ -263,7 +263,7 @@ Transform:
   - {fileID: 541288237849509521}
   - {fileID: 3819155054947087169}
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6084650095259836174
 MonoBehaviour:
@@ -279,7 +279,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   turretHead: {fileID: 8904550194178857510}
   enemyTarget: {fileID: 6432350598019638091, guid: 11140b4a500984f4bb6d0d5173f0d586, type: 3}
-  shootRange: 30
   placeParticle: {fileID: 2822374881837634637, guid: f6975a0c51472e343aebde6cfe17e1a8, type: 3}
   bulletParticle: {fileID: 6084650095273355119}
   lvlUPParticle: {fileID: 2822374881837634637, guid: 6edde677540317c4286eab4be1622679, type: 3}
@@ -291,6 +290,7 @@ MonoBehaviour:
   characteristics: {fileID: 0}
   Damage: 1
   CritChance: 3
+  shootRange: 30
 --- !u!65 &9029154832091458297
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -354,9 +354,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8852112547006179218}
   m_LocalRotation: {x: 0.7071066, y: -0, z: -0, w: 0.70710707}
-  m_LocalPosition: {x: -4, y: -0, z: -3}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: -4, y: -0, z: -2}
+  m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 7291094322379724181}
   m_RootOrder: -1
@@ -433,14 +433,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7291094322379724181}
     m_Modifications:
-    - target: {fileID: 5721247719239016279, guid: d67a1bb452f76de4fba61914b886fffd, type: 3}
-      propertyPath: ShapeModule.angle
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5721247719239016279, guid: d67a1bb452f76de4fba61914b886fffd, type: 3}
-      propertyPath: ShapeModule.radius.value
-      value: 0.0001
-      objectReference: {fileID: 0}
     - target: {fileID: 6955704362454442526, guid: d67a1bb452f76de4fba61914b886fffd, type: 3}
       propertyPath: m_RootOrder
       value: -1

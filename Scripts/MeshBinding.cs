@@ -1,9 +1,12 @@
 using UnityEngine;
+using System.Collections.Generic;
 [ExecuteInEditMode]
 [RequireComponent(typeof(Waypoint))] 
 public class MeshBinding : MonoBehaviour
 {
     Waypoint waypoint;
+    [SerializeField] GameObject selectPref;
+    [SerializeField] bool placeObject = false;
     private void Awake() 
     {
         waypoint = GetComponent<Waypoint>();
@@ -12,8 +15,8 @@ public class MeshBinding : MonoBehaviour
     {
         GridBind();
         PositionName();
+        ChangeBlock();
     }
-
     private void PositionName()
     {
         int GridSize = waypoint.GetGridSize();
@@ -27,5 +30,19 @@ public class MeshBinding : MonoBehaviour
     {
         int GridSize = waypoint.GetGridSize();
         transform.position = new Vector3(waypoint.GetGridPos().x*GridSize,0f,waypoint.GetGridPos().y*GridSize);
+    }
+    private void ChangeBlock()
+    {
+        if (placeObject)
+        {
+            GameObject currentBlock = transform.Find("baseBlock").gameObject;
+            DestroyImmediate(currentBlock);
+            currentBlock = Instantiate(selectPref, transform.position, Quaternion.identity);
+            currentBlock.transform.position = new Vector3(transform.position.x + 0.5f, transform.position.y - 9f, transform.position.z + 0.5f);
+            currentBlock.transform.localScale = new Vector3(4.5f,4.5f,4.5f);
+            currentBlock.transform.parent = transform;
+            currentBlock.transform.name = "baseBlock";
+            placeObject = false;
+        }
     }
 }

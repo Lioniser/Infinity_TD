@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 
 public class UI_Controller : MonoBehaviour
 {
+    public int mapLevel = 0;
     public int totalCoins = 10;
     public int pointsNum = 0;
     public Text life;
@@ -45,6 +46,7 @@ public class UI_Controller : MonoBehaviour
     private void Awake() 
     {
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
+        mapLevel = PlayerPrefs.GetInt("level");
 
         castle = FindObjectOfType<castle>();
         spawner = FindObjectOfType<EnemySpawner>();
@@ -69,6 +71,8 @@ public class UI_Controller : MonoBehaviour
     {
         pointsNum += PointsToAdd;
         points.text = pointsNum.ToString();
+        if (pointsNum > PlayerPrefs.GetInt("points"))
+            PlayerPrefs.SetInt("points", pointsNum);
     }
     public void AddCoinForKill(int CoinToAdd)
     {

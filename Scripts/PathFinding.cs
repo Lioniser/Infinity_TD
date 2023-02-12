@@ -67,7 +67,7 @@ public class PathFinding : MonoBehaviour
     }
     private void addToQueue(Waypoint addPoint)
     {
-        if (addPoint.check || queue.Contains(addPoint))
+        if (addPoint.check || queue.Contains(addPoint) || !addPoint.canBePath)
         return;
         else
         {

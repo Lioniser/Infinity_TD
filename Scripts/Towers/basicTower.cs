@@ -10,7 +10,7 @@ public class basicTower : MonoBehaviour
     [SerializeField] Transform turretHead;
     [SerializeField] Transform enemyTarget;
 
-    [SerializeField] float shootRange;
+    
     [SerializeField] ParticleSystem placeParticle;
     public ParticleSystem bulletParticle;
     public ParticleSystem lvlUPParticle;
@@ -27,6 +27,7 @@ public class basicTower : MonoBehaviour
     //Базові характеристики
     public float Damage = 1f;
     public float CritChance = 30f; //30%
+    public float shootRange = 30;
 
     private void Awake() 
     {

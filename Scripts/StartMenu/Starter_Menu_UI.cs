@@ -4,24 +4,35 @@ using UnityEngine.SceneManagement;
 
 public class Starter_Menu_UI : MonoBehaviour
 {
+    [SerializeField] Transform openMenu;
+    float scaleMulti;
+    [SerializeField] bool isOpen = false;
     [SerializeField] Text hint_text;
+    [SerializeField] Text points_text;
+    [SerializeField] Text wave1_text;
+    [SerializeField] Text wave2_text;
+    [SerializeField] Text wave3_text;
+    private UI_Controller Global_UI;
+    
     float timer;
-    public int TestInt {get; set;}
+
     void Start()
     {
         Hints();
+        PointsUpdater();
     }
 
     
     void Update()
     {
+        MapMenuController();
         Timer();
     }
 
     // ПІДКАЗКИ ЇБАТЬ
     private void Hints()
     {
-        int randomizedNumber = Mathf.RoundToInt(Random.Range(1f, 7f));
+        int randomizedNumber = Mathf.RoundToInt(Random.Range(1f, 6f));
         
         switch (randomizedNumber)
         {
@@ -75,10 +86,70 @@ public class Starter_Menu_UI : MonoBehaviour
         }
     }
 
-    public void ChangeScene()
+    private void PointsUpdater()
     {
-        SceneManager.LoadScene(1);
+        if (PlayerPrefs.HasKey("points"))
+        {
+            points_text.text = "Max points earned \n <size=80>" + PlayerPrefs.GetInt("points") + "</size>";
+        }
+        if (PlayerPrefs.HasKey("planes"))
+        {
+            wave1_text.text = "Max waves \ncompleted " + PlayerPrefs.GetInt("planes");
+        }
+        if (PlayerPrefs.HasKey("lakes"))
+        {
+            wave2_text.text = "Max waves \ncompleted " + PlayerPrefs.GetInt("lakes");
+        }
+        if (PlayerPrefs.HasKey("forest"))
+        {    
+            wave3_text.text = "Max waves \ncompleted " + PlayerPrefs.GetInt("forest");
+        }
     }
+
+    private void MapMenuController()
+    {
+        openMenu.transform.localScale = new Vector3(scaleMulti, scaleMulti, scaleMulti);
+        
+        if (isOpen)
+        {
+            if (scaleMulti < 1)
+            scaleMulti += Time.deltaTime * 4;
+            else
+            scaleMulti = 1;
+        }
+        else
+        {
+            if (scaleMulti > 0.1)
+            scaleMulti -= Time.deltaTime * 5;
+            else
+            scaleMulti = 0;
+        }
+
+    }
+
+    public void MapMenuButton()
+    {
+        if (isOpen)
+        isOpen = false;
+        else
+        isOpen = true;
+    }
+
+    public void ChooseLevel(int levelNum)
+    {
+        PlayerPrefs.SetInt("level", levelNum); 
+        SceneManager.LoadScene(levelNum);
+    }
+
+    public void ResetSave()
+    {
+        PlayerPrefs.SetInt("points", 0);
+        PlayerPrefs.SetInt("planes", 0);
+        PlayerPrefs.SetInt("lakes", 0);
+        PlayerPrefs.SetInt("forest", 0);
+        PointsUpdater();
+    }
+
     public void CloseApp()
     {
         Application.Quit();

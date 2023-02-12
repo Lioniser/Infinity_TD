@@ -96,5 +96,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14b2dad986ed5e148a8b03e5eefd7e97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  castleLife: 10
-  damageDealt: 1
+  castleLife: 30
