@@ -10,26 +10,31 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] Enemy bossPref;
     [SerializeField] AudioClip enemySpawnAudioFX;
     [SerializeField] AudioClip bossSpawnAudioFX;
-    [SerializeField] UI_Controller UI;
+    private UI_Controller UI;
     [SerializeField] AudioSource AmbientMusic;
 
     public IEnumerator waveSpawner;
     private IEnumerator enemySpawner;
     public int spawnProbability = 0;
-    int TotalEnemyNumber;
-    int mobNumberInWave = 5;
+    private int TotalEnemyNumber;
+    private int mobNumberInWave = 5;
     public int waveNum = 1;
-    float waveTime = 0;
-    bool isTimerOn = false;
+    private float waveTime = 0;
+    private bool isTimerOn = false;
+    public bool isSpawnStarted = false;
     public bool waveActive = false;
     float fade = 1f;
     public bool start = false;
     
+    private void Awake() 
+    {
+        UI = FindObjectOfType<UI_Controller>();
+    }
     private void Update() 
     {
         UI.CheckWIN();
 
-        if (transform.childCount == 0 && start && !isTimerOn)
+        if (transform.childCount == 0 && start && !isTimerOn && !isSpawnStarted)
         {
             WaveSaver();
             isTimerOn = true;
@@ -41,9 +46,11 @@ public class EnemySpawner : MonoBehaviour
     private IEnumerator enemySpawn()
     {
         UI.WaveStarted.text = "Wave Started";
-    
+        isSpawnStarted = true;
+
         for (int i = 1; i <= mobNumberInWave; i++)
         {
+            
             if (waveNum <= 10)
             {
                 if (i == mobNumberInWave && waveNum % 5 == 0)
@@ -128,6 +135,7 @@ public class EnemySpawner : MonoBehaviour
         UI.WaveNum_TXT.text = "Wave: " + waveNum;
 
         yield return StartCoroutine(enemySpawn());
+        isSpawnStarted = false;
         
         //Наступна хвиля
         waveNum++;
@@ -168,7 +176,7 @@ public class EnemySpawner : MonoBehaviour
             StartCoroutine(waveSpawn());   
         }
         
-        if (isTimerOn)
+        if (isTimerOn && !isSpawnStarted)
         {
             StartCoroutine(waveSpawn());
             isTimerOn = false;
@@ -176,7 +184,7 @@ public class EnemySpawner : MonoBehaviour
     }
     private void WaveTimer()
     {
-        if (isTimerOn)
+        if (isTimerOn && !isSpawnStarted)
         {
             UI.WaveCooldown_TXT.text = "Next in " + Mathf.Round(waveTime) + " seconds";
 

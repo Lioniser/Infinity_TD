@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 5194370373466677100}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 4.0205073, y: 8.707062, z: -0.6327093}
-  m_LocalScale: {x: -0.07, y: 0.07, z: 0}
+  m_LocalScale: {x: -0.1, y: 0.1, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -41,8 +41,8 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5194370373466677100}
   m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
   m_MotionVectors: 1
@@ -90,7 +90,7 @@ TextMesh:
   m_Anchor: 0
   m_Alignment: 0
   m_TabSize: 4
-  m_FontSize: 300
+  m_FontSize: 350
   m_FontStyle: 0
   m_RichText: 1
   m_Font: {fileID: 12800000, guid: db5e7fc632858204288ae6cfb191305b, type: 3}

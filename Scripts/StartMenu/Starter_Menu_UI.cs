@@ -4,6 +4,12 @@ using UnityEngine.SceneManagement;
 
 public class Starter_Menu_UI : MonoBehaviour
 {
+    [SerializeField] int teslaTowerLock = 0;
+    [SerializeField] int frostTowerLock = 0;
+    [SerializeField] Sprite[] sprites;
+    [SerializeField] Image teslaIMG, frostIMG;
+    [SerializeField] Text teslaAvTXT, teslaNameTXT, frostAvTXT, frostNameTXT;
+
     [SerializeField] Transform openMenu;
     float scaleMulti;
     [SerializeField] bool isOpen = false;
@@ -20,6 +26,18 @@ public class Starter_Menu_UI : MonoBehaviour
     {
         Hints();
         PointsUpdater();
+
+        if (PlayerPrefs.HasKey("teslaTowerLock"))
+            teslaTowerLock = PlayerPrefs.GetInt("teslaTowerLock");
+        else
+            PlayerPrefs.SetInt("teslaTowerLock", 0);
+
+        if (PlayerPrefs.HasKey("frostTowerLock"))
+            frostTowerLock = PlayerPrefs.GetInt("frostTowerLock");
+        else
+            PlayerPrefs.SetInt("frostTowerLock", 0);
+
+        CheckTowerAvailable();
     }
 
     
@@ -39,7 +57,7 @@ public class Starter_Menu_UI : MonoBehaviour
             case 1:
             {
                 hint_text.text = 
-                "You can lvlup towers. Just click on it";
+                "You can lvlup towers. Just click on it to open menu";
             }
             break;
             case 2:
@@ -57,7 +75,7 @@ public class Starter_Menu_UI : MonoBehaviour
             case 4:
             {
                 hint_text.text = 
-                "Tesla tower can chain. Each 5 LVL`s of your tesla tower will increase your chain number of targets";
+                "Tesla tower can chain. Each 5 LVL`s of your tesla tower will increase chain number of targets";
             }
             break;
             case 5:
@@ -74,6 +92,38 @@ public class Starter_Menu_UI : MonoBehaviour
             break;
         }
 
+    }
+    private void CheckTowerAvailable()
+    {
+        if (teslaTowerLock == 1)
+        {
+            teslaIMG.sprite = sprites[1];
+            teslaAvTXT.text = "Available";
+            teslaAvTXT.color = Color.green;
+            teslaNameTXT.text = "Tesla\nTower";
+        }
+        else
+        {
+            teslaIMG.sprite = sprites[0];
+            teslaAvTXT.text = "Complete\n<color=#FFD700>planes</color> map";
+            teslaAvTXT.color = Color.red;
+            teslaNameTXT.text = "";
+        }
+
+        if (frostTowerLock == 1)
+        {
+            frostIMG.sprite = sprites[2];
+            frostAvTXT.text = "Available";
+            frostAvTXT.color = Color.green;
+            frostNameTXT.text = "Frost\nTower";
+        }
+        else
+        {
+            frostIMG.sprite = sprites[0];
+            frostAvTXT.text = "Complete\n<color=#4169E1>lakes</color> map";
+            frostAvTXT.color = Color.red;
+            frostNameTXT.text = "";
+        }
     }
 
     private void Timer()
@@ -147,6 +197,12 @@ public class Starter_Menu_UI : MonoBehaviour
         PlayerPrefs.SetInt("planes", 0);
         PlayerPrefs.SetInt("lakes", 0);
         PlayerPrefs.SetInt("forest", 0);
+        PlayerPrefs.SetInt("teslaTowerLock", 0);
+        teslaTowerLock = 0;
+        PlayerPrefs.SetInt("frostTowerLock", 0);
+        frostTowerLock = 0;
+
+        CheckTowerAvailable();
         PointsUpdater();
     }
 

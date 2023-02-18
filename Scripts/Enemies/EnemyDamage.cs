@@ -50,7 +50,7 @@ public class EnemyDamage : MonoBehaviour
     private void OnParticleCollision(GameObject other)
     {
         basicTower _tower = other.GetComponentInParent<basicTower>();
-        GetHit(_tower.Damage, _tower.CritChance);
+        GetHit(_tower.damage, _tower.critChance);
     }
     public void DestroyEnemy(bool isAdd)
     {
@@ -107,12 +107,12 @@ public class EnemyDamage : MonoBehaviour
 
     private void DamageText(float damage, Color textColor)
     {
-        Vector3 posToCreate = new Vector3(transform.position.x, transform.position.y+7, transform.position.z);
+        Vector3 posToCreate = new Vector3(transform.position.x, transform.position.y+12, transform.position.z);
         TextMesh text = Instantiate(textDamage, posToCreate, Quaternion.identity);
         text.color = textColor;
         text.transform.LookAt(Camera.main.transform.position);
         text.text = damage.ToString();
-        Destroy(text.gameObject, 0.4f);
+        Destroy(text.gameObject, 0.6f);
     }
     private void HealthBarUpdater()
     {
@@ -135,16 +135,15 @@ public class EnemyDamage : MonoBehaviour
     }
     private void FrozenIcon()
     {
-        EnemyMovement FrozenIcon = GetComponent<EnemyMovement>();
-        if (FrozenIcon.isFrozen)
+        EnemyMovement frozenIcon = GetComponent<EnemyMovement>();
+        if (frozenIcon.isFrozen)
         {
             frostedObj.SetActive(true);
-            frostedObj.transform.localScale = new Vector3(3f,3f,3f);
+            frostedObj.transform.localScale = new Vector3(2f,2f,2f);
         }
         else
         {
             frostedObj.SetActive(false);
-            frostedObj.transform.localScale = new Vector3(1f,1f,1f);
         }
     }
 

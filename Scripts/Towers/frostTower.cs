@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 
 [SelectionBase]
 [RequireComponent(typeof(tower))]
@@ -15,24 +16,24 @@ public class frostTower : MonoBehaviour
     [SerializeField] Transform enemyTarget;
 
     public int lvl = 1;
-    private int lvlUpPrice = 4;
-    public TextMesh lvl_txt;
+    private int lvlUpPrice;
+    public TextMeshPro lvl_txt;
+    [SerializeField] private AudioClip levelUp_SND;
     public TextMesh lvlUP_price_txt;
     
     public tower tower;
-    public Waypoint baseWaypoint;
     
 
     public frostTowerUI characteristics;
     // Базові характеристики
     public float shootRange;
-    public float attackSpeed = 1f;
-    public float Damage = 0.1f;
-    public float CritChance = 10f; //10%
+    public float attackSpeed;
+    public float damage;
+    public float critChance = 10f; //10%
     // Унікальні характеристики для вежі
-    public float AreaOfEffect;
-    public float FrozenMulti = 1.5f;
-    public float FrozenTime = 1.5f;
+    public float areaOfEffect;
+    public float frozenMulti;
+    public float frozenTime;
     float _t = 0f;
     private void Awake() 
     {
@@ -43,7 +44,8 @@ public class frostTower : MonoBehaviour
     private void Start()
     {
         Instantiate(placeParticle, transform.position, Quaternion.Euler(-90f,0f,0f));
-        AreaOfEffect = shootRange - 5;
+        areaOfEffect = shootRange - 5;
+        CalculatelvlUpPrice();
         lvlUP_price_txt.text = "o" + lvlUpPrice;
     }
     private void Update()
@@ -97,10 +99,10 @@ public class frostTower : MonoBehaviour
             
                 for (int i = 0; i < NearEnemies.Count; i++)
                 {
-                    NearEnemies[i].GetComponent<EnemyDamage>().GetHit(Damage,CritChance);
+                    NearEnemies[i].GetComponent<EnemyDamage>().GetHit(damage,critChance);
                     if (NearEnemies[i].isFrozen)
                     continue;
-                    NearEnemies[i].Freeze(FrozenMulti, FrozenTime);
+                    NearEnemies[i].Freeze(frozenMulti, frozenTime);
                 }
             }
     }
@@ -123,24 +125,14 @@ public class frostTower : MonoBehaviour
     }
     private void frostExplosion()
     {
-        Vector3 newPOs = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y + 10, gameObject.transform.position.z);
+        Vector3 newPOs = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y + 5, gameObject.transform.position.z);
         ParticleSystem ParticlesFROST = Instantiate(frostEXParticle, newPOs, Quaternion.Euler(-90f,0f,0f));
 
         ParticleSystem.ShapeModule ExplsSize;
         ExplsSize = ParticlesFROST.shape;
-        ExplsSize.radius = AreaOfEffect;
+        ExplsSize.radius = areaOfEffect;
 
         _t = 0;
-    }
-
-    public void Characteristic_text_updater()
-    {
-        characteristics.dmg_txt.text = "Damage:		" + Damage;
-        characteristics.spd_txt.text = "Attack speed:	" + attackSpeed;
-        characteristics.rng_txt.text = "Range:			" + shootRange;
-        characteristics.AOE_txt.text = "Area radius     " + AreaOfEffect;
-        characteristics.FrozenTime_txt.text = "Frost multi			" + FrozenTime;
-        characteristics.FrozenMulti_txt.text = "Frost time (sec)	" + FrozenMulti;
     }
 
     public void lvlUp()
@@ -150,40 +142,67 @@ public class frostTower : MonoBehaviour
         if (Global_UI.totalCoins >= lvlUpPrice && Tmenu.transform.localScale.x >= 1)
         {
             Instantiate(lvlUPParticle.gameObject, transform.position, Quaternion.Euler(-90f,0f,0f));
+            AudioSource.PlayClipAtPoint(levelUp_SND, Camera.main.transform.position, 0.3f);
 
             lvl++;
             lvl_txt.text = "LVL " + lvl;
-
-            Damage = Mathf.Round((Mathf.Sqrt(lvl * 0.1f + Damage)) * 10) / 10;
-
-            if (lvl%5 == 0)
-            attackSpeed = Mathf.Round(1.1f * attackSpeed * 10) / 10;
-
+            
+            Damage();
             if (lvl%10 == 0)
             {
-            shootRange += 5;
-            AreaOfEffect += 5;
+                shootRange += 5;
+                areaOfEffect += 5;
             }
-
             if (lvl%3 == 0)
             {
-            FrozenMulti = Mathf.Round((FrozenMulti * 1.3f) * 10) / 10f;    
-            FrozenTime = Mathf.Round((FrozenTime * 1.1f) * 10) / 10f;  
+                FrozenCalculation("multi");
+                FrozenCalculation("time");
             }
-
             Characteristic_text_updater();
+
             Global_UI.AddCoin(-lvlUpPrice);
+            tower.CalculateTotalTowerPrice(lvlUpPrice);
             CalculatelvlUpPrice();
         }
         else if (Global_UI.totalCoins < lvlUpPrice && Tmenu.transform.localScale.x >= 1)
         {
-            Global_UI.CoinsErrorMessage("Not Enough Coins", Color.red);
+            Global_UI.CoinsErrorMessage("Not enought to level up", Color.red);
         }
     }
 
     private void CalculatelvlUpPrice()
     {
-        lvlUpPrice = Mathf.RoundToInt(Mathf.Sqrt(lvl - 1) * 10f + lvlUpPrice);
+        lvlUpPrice = Mathf.RoundToInt(Mathf.Sqrt(lvl) * lvl * 3);
         lvlUP_price_txt.text = "o" + lvlUpPrice;
     }
+
+     private float Damage()
+    {
+        return damage = Mathf.Round(0.1f * Mathf.Sqrt(lvl) * 10) / 10 + 0.1f;
+    }
+    private float AttackSpeed()
+    {
+        return attackSpeed = Mathf.Round(0.1f * Mathf.Sqrt(lvl) * 10) / 10 + 0.5f;
+    }
+
+    private float FrozenCalculation(string typeOfReturn)
+    {
+        if (typeOfReturn == "multi")
+            return frozenMulti = Mathf.Round(0.4f * Mathf.Sqrt(lvl) * 10) / 10f + 0.5f;
+        else if (typeOfReturn == "time")
+            return frozenTime = Mathf.Round(0.3f * Mathf.Sqrt(lvl) * 10) / 10f + 1f; 
+        else 
+            return 0;
+    }
+
+    public void Characteristic_text_updater()
+    {
+        characteristics.dmg_txt.text = "Damage:		" + damage;
+        characteristics.spd_txt.text = "Attack speed:	" + attackSpeed;
+        characteristics.rng_txt.text = "Range:			" + shootRange;
+        characteristics.AOE_txt.text = "Area radius     " + areaOfEffect;
+        characteristics.FrozenTime_txt.text = "Frost multi			" + frozenMulti;
+        characteristics.FrozenMulti_txt.text = "Frost time (sec)	" + frozenTime;
+    }
+    
 }

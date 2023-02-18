@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 using System.Collections.Generic;
 
 [SelectionBase]
@@ -13,23 +14,23 @@ public class teslaTower : MonoBehaviour
     [SerializeField] LightningBoltScript LightningAnimation;
     [SerializeField] LightningBoltScript LightningBolt;
 
-    [SerializeField] float shootRange;
     [SerializeField] ParticleSystem placeParticle;
     public ParticleSystem lvlUPParticle;
 
     public int lvl = 1;
-    private int lvlUpPrice = 5;
-    public TextMesh lvl_txt;
+    private int lvlUpPrice;
+    public TextMeshPro lvl_txt;
+    [SerializeField] AudioClip levelUp_SND;
     public TextMesh lvlUP_price_txt;
 
-    public Waypoint baseWaypoint;
     public tower tower;
 
     public teslaTowerUI characteristics;
-    public float Damage = 1f;
-    public float CritChance = 5f; //5%
-    public float attackSpeed = 1f;
-    public int chainNums = 1;
+    public float damage;
+    public float critChance; //5%
+    public float attackSpeed;
+    public float shootRange;
+    public int chainNums;
 
     private void Awake() 
     {
@@ -40,9 +41,11 @@ public class teslaTower : MonoBehaviour
     private void Start()
     {
         Instantiate(placeParticle, transform.position, Quaternion.Euler(-90f,0f,0f));
+        CalculatelvlUpPrice();
         lvlUP_price_txt.text = "o" + lvlUpPrice;
         LightningAnimation.StartObject = gameObject;
         LightningAnimation.EndObject = turretHead.gameObject;
+
     }
     void Update()
     {
@@ -155,7 +158,7 @@ public class teslaTower : MonoBehaviour
     }
     private void generateBolt(GameObject firstObj, GameObject secondObj)
     {
-        secondObj.GetComponent<EnemyDamage>().GetHit(Damage, CritChance);
+        secondObj.GetComponent<EnemyDamage>().GetHit(damage, critChance);
 
         LightningBoltScript _LightningBolt = Instantiate(LightningBolt, firstObj.transform);
         _LightningBolt.transform.parent = transform;
@@ -166,13 +169,7 @@ public class teslaTower : MonoBehaviour
         Destroy(_LightningBolt.gameObject, 0.2f);
     } 
 
-    public void Characteristic_text_updater()
-    {
-        characteristics.dmg_txt.text = "Damage:		" + Damage;
-        characteristics.spd_txt.text = "Attack speed:	" + attackSpeed;
-        characteristics.rng_txt.text = "Range:			" + shootRange;
-        characteristics.chn_txt.text = "Chains:			" + chainNums;
-    }
+    
 
     public void lvlUp()
     {
@@ -181,31 +178,48 @@ public class teslaTower : MonoBehaviour
         if (Global_UI.totalCoins >= lvlUpPrice && Tmenu.transform.localScale.x >= 1)
         {
             Instantiate(lvlUPParticle.gameObject, transform.position, Quaternion.Euler(-90f,0f,0f));
+            AudioSource.PlayClipAtPoint(levelUp_SND, Camera.main.transform.position, 0.3f);
 
             lvl++;
             lvl_txt.text = "LVL " + lvl;
 
-            Damage = Mathf.Round((Mathf.Sqrt(lvl + Damage)) * 10) / 10;
-
+            CalculateDamage();
             if (lvl%2 == 0)
-            attackSpeed = Mathf.Round(1.1f * attackSpeed * 10) / 10;
-
+                CalculateAttackSpeed();
             if (lvl%5 == 0)
-            chainNums++;
-
+                chainNums++;
             Characteristic_text_updater();
+
             Global_UI.AddCoin(-lvlUpPrice);
+            tower.CalculateTotalTowerPrice(lvlUpPrice);
             CalculatelvlUpPrice();
         }
         else if (Global_UI.totalCoins < lvlUpPrice && Tmenu.transform.localScale.x >= 1)
         {
-            Global_UI.CoinsErrorMessage("Not Enough Coins", Color.red);
+            Global_UI.CoinsErrorMessage("Not enought to level up", Color.red);
         }
     }
 
     private void CalculatelvlUpPrice()
     {
-        lvlUpPrice = Mathf.RoundToInt(Mathf.Sqrt(lvl - 1) * 5f + lvlUpPrice);
+        lvlUpPrice = Mathf.RoundToInt(Mathf.Sqrt(lvl) * lvl * 5 + 10);
         lvlUP_price_txt.text = "o" + lvlUpPrice;
     }
+
+    private void CalculateDamage()
+    {
+        damage = Mathf.Round(4 * (Mathf.Sqrt(lvl)) * 10) / 10;
+    }
+    private void CalculateAttackSpeed()
+    {
+        attackSpeed = Mathf.Round(Mathf.Sqrt(lvl) * 0.1f * 10) / 10 + 0.8f;
+    }
+    public void Characteristic_text_updater()
+    {
+        characteristics.dmg_txt.text = "Damage:		" + damage;
+        characteristics.spd_txt.text = "Attack speed:	" + attackSpeed;
+        characteristics.rng_txt.text = "Range:			" + shootRange;
+        characteristics.chn_txt.text = "Chains:			" + chainNums;
+    }
+    
 }

@@ -3,7 +3,12 @@ guid: 12a38727196e79e42b7c6a6c809b6c53
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - baseWaypoint: {instanceID: 0}
+  - delPrice_txt: {instanceID: 0}
+  - towerBreak_sound: {instanceID: 0}
+  - towerBreak_PS: {instanceID: 0}
+  - Tmenu: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

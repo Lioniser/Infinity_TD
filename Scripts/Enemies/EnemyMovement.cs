@@ -8,7 +8,9 @@ public class EnemyMovement : MonoBehaviour
 
     private PathFinding pathfinder;
     private EnemyDamage damage;
-    public float speed;
+    public float currentSpeed;
+    public float basicSpeed;
+    private float freezeTime = 0f;
 
     castle castle;
     Vector3 startPos;
@@ -22,13 +24,16 @@ public class EnemyMovement : MonoBehaviour
     }
     void Start()
     {
-        speed = damage.enemy.speed;
+        basicSpeed = damage.enemy.speed;
+        currentSpeed = basicSpeed;
+
         path = pathfinder.setPath();
         StartCoroutine(enemyMove(path));
     }
     void Update()
     {
-        transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime / (speed / 2));
+        FreezeMovement();
+        transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime / (currentSpeed / 2));
     }
     
     IEnumerator enemyMove(List<Waypoint> path)
@@ -37,26 +42,30 @@ public class EnemyMovement : MonoBehaviour
         { 
             transform.LookAt(waypoint.transform);
             targetPos = waypoint.transform.position;
-            yield return new WaitForSeconds(speed);
+            yield return new WaitForSeconds(currentSpeed);
         }
         damage.DestroyEnemy(false);
         castle.CastleDamage(GetComponent<Enemy>().pointsCost);
     }
 
-    public void Freeze(float _frozenMultiplayer, float _FrozenTime)
+    public void Freeze(float _frozenMultiplayer, float _freezeTime)
     {
+        freezeTime = _freezeTime;
+        currentSpeed = Mathf.Round(basicSpeed * (_frozenMultiplayer + 1f) * 10) / 10;
         isFrozen = true;
-        StartCoroutine(FrozenMovement(_frozenMultiplayer, _FrozenTime));
     }
 
-    private IEnumerator FrozenMovement(float _frozenMultiplayer, float _FrozenTime)
+    private void FreezeMovement()
     {
-        float _speed = speed;
-        speed = Mathf.Round(speed * _frozenMultiplayer * 10)/10;
-
-        yield return new WaitForSeconds(_FrozenTime);
-        
-        isFrozen = false;
-        speed = _speed;
+        if (freezeTime > 0)
+        {
+            freezeTime -= Time.deltaTime;
+        }
+        else if (freezeTime < 0)
+        {
+            isFrozen = false;
+            freezeTime = 0f;
+            currentSpeed = basicSpeed;
+        }
     }
 }

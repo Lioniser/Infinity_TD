@@ -5,67 +5,66 @@ public class TowerFactory : MonoBehaviour
 {
     [SerializeField] AudioClip towerPlacedSND;
     [SerializeField] basicTower basic_towerToPlace;
+    public int basic_towerPrice;
     [SerializeField] teslaTower tesla_towerToPlace;
+    public int tesla_towerPrice;
     [SerializeField] frostTower frost_towerToPlace;
+    public int frost_towerPrice;
     UI_Controller Global_UI;
 
-    [SerializeField] Image ChosedTowerImage;
     [SerializeField] Sprite[] TowerImages;
     public string towerType;
 
-    int TowerNum = 0;
-    int TeslaTowerNum = 0;
-    int FrostTowerNum = 0;
+    public int basicTowerNum = 0;
+    public int teslaTowerNum = 0;
+    public int frostTowerNum = 0;
     public int towerPrice;
 
     private void Start() 
     {
         Global_UI = FindObjectOfType<UI_Controller>();
         towerType = "empty";
+
+        
+        Global_UI.basicTowerPrice_txt.text = "o" + basic_towerPrice;
+        Global_UI.teslaTowerPrice_txt.text = "o" + tesla_towerPrice;
+        Global_UI.frostTowerPrice_txt.text = "o" + frost_towerPrice;
     }
     private void Update() 
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
-        chooseTower("Tower");
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        chooseTower("TeslaTower");
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        chooseTower("FrostTower");
+            chooseTower("BasicTower");
+        if (Input.GetKeyDown(KeyCode.Alpha2) && PlayerPrefs.GetInt("AvailabilityLVL") == 1)
+            chooseTower("TeslaTower");
+        if (Input.GetKeyDown(KeyCode.Alpha3) && PlayerPrefs.GetInt("AvailabilityLVL") == 2)
+            chooseTower("FrostTower");
         if (Input.GetKeyDown(KeyCode.Escape))
-        chooseTower("empty");
-        if (Input.GetKeyDown(KeyCode.Mouse0))
-        {
-            RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            Physics.Raycast(ray, out hit);
-            if (hit.transform.name == "Ground")
             chooseTower("empty");
-        }
     }
     public void chooseTower(string _towerType)
     {
-        if(_towerType == "Tower")
+        if(_towerType == "BasicTower")
         {
-            towerType = "Tower";
-            ChosedTowerImage.sprite = TowerImages[1];
-            towerPrice = 2;
+            towerType = "BasicTower";
+            Global_UI.ChosedTowerImage.sprite = TowerImages[1];
+            towerPrice = basic_towerPrice;
         }
         else if(_towerType == "TeslaTower")
         {
             towerType = "TeslaTower";
-            ChosedTowerImage.sprite = TowerImages[2];
-            towerPrice = 5;
+            Global_UI.ChosedTowerImage.sprite = TowerImages[2];
+            towerPrice = tesla_towerPrice;
         }
         else if(_towerType == "FrostTower")
         {
             towerType = "FrostTower";
-            ChosedTowerImage.sprite = TowerImages[3];
-            towerPrice = 4;
+            Global_UI.ChosedTowerImage.sprite = TowerImages[3];
+            towerPrice = frost_towerPrice;
         }
         else if(_towerType == "empty")
         {
             towerType = "empty";
-            ChosedTowerImage.sprite = TowerImages[0];
+            Global_UI.ChosedTowerImage.sprite = TowerImages[0];
             towerPrice = 0;
             Global_UI.AddPlacer(false, null, null);
         }
@@ -77,7 +76,7 @@ public class TowerFactory : MonoBehaviour
         return;
 
         Waypoint waypoint = FindObjectOfType<Placer>().currentWaypoint;
-        if (towerType == "Tower" && waypoint.isPlaceble && Global_UI.isPlacerActive)
+        if (towerType == "BasicTower" && waypoint.isPlaceble && Global_UI.isPlacerActive)
             createTower(waypoint, towerType);
         if (towerType == "TeslaTower" && waypoint.isPlaceble && Global_UI.isPlacerActive)
             createTeslaTower(waypoint, towerType);
@@ -89,52 +88,70 @@ public class TowerFactory : MonoBehaviour
 
     private void createTower(Waypoint waypoint, string _towerType)
     {
-        if (Global_UI.totalCoins >= 2)
+        if (Global_UI.totalCoins >= basic_towerPrice)
         {
-            TowerNum++;
+            basicTowerNum++;
             AudioSource.PlayClipAtPoint(towerPlacedSND, Camera.main.transform.position, 0.1f);
             basicTower newTower = Instantiate(basic_towerToPlace, waypoint.transform.position, Quaternion.identity);
+            newTower.tower.CalculateTotalTowerPrice(basic_towerPrice);
             newTower.tower.towerTypeParam = _towerType;
-            newTower.name = "Tower №" + TowerNum;
+            newTower.name = "Basic Tower №" + basicTowerNum;
             newTower.transform.parent = transform;
             waypoint.towerHere = true;
-            // newTower.baseWaypoint = waypoint;
-            Global_UI.AddCoin(-2);
+            newTower.tower.baseWaypoint = waypoint;
+
+            Global_UI.AddCoin(-basic_towerPrice);
             Global_UI.coins.text = "o " + Global_UI.totalCoins;
+
+            basic_towerPrice += basicTowerNum * basicTowerNum / 3;
+            towerPrice = basic_towerPrice;
+            Global_UI.basicTowerPrice_txt.text = "o" + basic_towerPrice;
         }
     }
 
     private void createTeslaTower(Waypoint waypoint, string _towerType)
     {
-        if (Global_UI.totalCoins >= 5)
+        if (Global_UI.totalCoins >= tesla_towerPrice)
         {
-            TeslaTowerNum++;
+            teslaTowerNum++;
             AudioSource.PlayClipAtPoint(towerPlacedSND, Camera.main.transform.position, 0.1f);
             teslaTower newTower = Instantiate(tesla_towerToPlace, waypoint.transform.position, Quaternion.identity);
+            newTower.tower.CalculateTotalTowerPrice(tesla_towerPrice);
             newTower.tower.towerTypeParam = _towerType;
-            newTower.name = "Tesla Tower №" + TeslaTowerNum;
+            newTower.name = "Tesla Tower №" + teslaTowerNum;
             newTower.transform.parent = transform;
             waypoint.towerHere = true;
-            // newTower.baseWaypoint = waypoint;
-            Global_UI.AddCoin(-5);
+            newTower.tower.baseWaypoint = waypoint;
+            
+            Global_UI.AddCoin(-tesla_towerPrice);
             Global_UI.coins.text = "o " + Global_UI.totalCoins;
+
+            tesla_towerPrice += teslaTowerNum * teslaTowerNum * 2;
+            towerPrice = tesla_towerPrice;
+            Global_UI.teslaTowerPrice_txt.text = "o" + tesla_towerPrice;
         }
     }
 
     private void createFrostTower(Waypoint waypoint, string _towerType)
     {
-        if (Global_UI.totalCoins >= 4)
+        if (Global_UI.totalCoins >= frost_towerPrice)
         {
-            FrostTowerNum++;
+            frostTowerNum++;
             AudioSource.PlayClipAtPoint(towerPlacedSND, Camera.main.transform.position, 0.1f);
             frostTower newTower = Instantiate(frost_towerToPlace, waypoint.transform.position, Quaternion.identity);
+            newTower.tower.CalculateTotalTowerPrice(frost_towerPrice);
             newTower.tower.towerTypeParam = _towerType;
-            newTower.name = "Frost Tower №" + FrostTowerNum;
+            newTower.name = "Frost Tower №" + frostTowerNum;
             newTower.transform.parent = transform;
             waypoint.towerHere = true;
-            // newTower.baseWaypoint = waypoint;
-            Global_UI.AddCoin(-4);
+            newTower.tower.baseWaypoint = waypoint;
+
+            Global_UI.AddCoin(-frost_towerPrice);
             Global_UI.coins.text = "o " + Global_UI.totalCoins;
+
+            frost_towerPrice += frostTowerNum * frostTowerNum;
+            towerPrice = frost_towerPrice;
+            Global_UI.frostTowerPrice_txt.text = "o" + frost_towerPrice;
         }
     }
 }

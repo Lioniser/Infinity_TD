@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System;
+using TMPro;
 
 [SelectionBase]
 [RequireComponent(typeof(tower))]
@@ -13,21 +14,23 @@ public class basicTower : MonoBehaviour
     
     [SerializeField] ParticleSystem placeParticle;
     public ParticleSystem bulletParticle;
+    [SerializeField] ParticleSystem.EmissionModule bP_emission;
     public ParticleSystem lvlUPParticle;
 
     public int lvl = 1;
-    private int lvlUpPrice = 3;
-    public TextMesh lvl_txt;
+    private int lvlUpPrice;
+    public TextMeshPro lvl_txt;
+    [SerializeField] private AudioClip levelUp_SND;
     public TextMesh lvlUP_price_txt;
     
-    public Waypoint baseWaypoint;
     public tower tower;
 
     public basicTowerUI characteristics;
     //Базові характеристики
-    public float Damage = 1f;
-    public float CritChance = 30f; //30%
-    public float shootRange = 30;
+    public float damage;
+    public float attackSpeed;
+    public float critChance; //30%
+    public float shootRange;
 
     private void Awake() 
     {
@@ -38,7 +41,11 @@ public class basicTower : MonoBehaviour
     private void Start()
     {
         Instantiate(placeParticle, transform.position, Quaternion.Euler(-90f,0f,0f));
+        CalculatelvlUpPrice();
         lvlUP_price_txt.text = "o" + lvlUpPrice;
+
+        bP_emission = bulletParticle.emission;
+        bP_emission.rateOverTimeMultiplier = attackSpeed;
     }
     void Update()
     {
@@ -97,12 +104,7 @@ public class basicTower : MonoBehaviour
         emission.enabled = isActive;
     }
 
-    public void Characteristic_text_updater()
-    {
-        characteristics.dmg_txt.text = "Damage:		" + Damage;
-        characteristics.spd_txt.text = "Attack speed:	" + bulletParticle.emission.rateOverTimeMultiplier;
-        characteristics.rng_txt.text = "Range:			" + shootRange;
-    }
+    
 
     public void lvlUp()
     {
@@ -112,28 +114,52 @@ public class basicTower : MonoBehaviour
         if (Global_UI.totalCoins >= lvlUpPrice && Tmenu.transform.localScale.x >= 1)
         {
             Instantiate(lvlUPParticle.gameObject, transform.position, Quaternion.Euler(-90f,0f,0f));
+            AudioSource.PlayClipAtPoint(levelUp_SND, Camera.main.transform.position, 0.3f);
+
             lvl++;
             lvl_txt.text = "LVL " + lvl;
 
-            Damage = Mathf.Round((Mathf.Sqrt(lvl + Damage))*10)/10;
-
-            ParticleSystem.EmissionModule towerSpeed = bulletParticle.emission;
-            towerSpeed.rateOverTimeMultiplier = Mathf.Round((Mathf.Sqrt(lvl * 0.3f + bulletParticle.emission.rateOverTimeMultiplier))*10)/10;
-
+            CalculateDamage();
+            CalculateAttackSpeed();
             Characteristic_text_updater();
+
             Global_UI.AddCoin(-lvlUpPrice);
+            tower.CalculateTotalTowerPrice(lvlUpPrice);
             CalculatelvlUpPrice();
         }
         else if (Global_UI.totalCoins < lvlUpPrice && Tmenu.transform.localScale.x >= 1)
         {
-            Global_UI.CoinsErrorMessage("Not Enough Coins", Color.red);
+            Global_UI.CoinsErrorMessage("Not enought to level up", Color.red);
         }
         
     }
-
+    
     private void CalculatelvlUpPrice()
     {
-        lvlUpPrice = Mathf.RoundToInt(Mathf.Sqrt(lvl - 1) * 1.5f + lvlUpPrice);
+        lvlUpPrice = Mathf.RoundToInt(Mathf.Sqrt(lvl) * lvl * 2 + 2);
         lvlUP_price_txt.text = "o" + lvlUpPrice;
     }
+
+    private void CalculateDamage()
+    {
+        damage = Mathf.Round(2 * Mathf.Sqrt(lvl) * 10) / 10 - 1f;
+    }
+    private void CalculateAttackSpeed()
+    {
+        bP_emission.rateOverTimeMultiplier = 0.8f + Mathf.Round(0.2f * Mathf.Sqrt(lvl) * 10) / 10;
+    }
+    // private float CritChance()
+    // {
+    //     return damage = Mathf.Round((Mathf.Sqrt(lvl) * 2)*10)/10;
+    // }
+    public void Characteristic_text_updater()
+    {
+        characteristics.dmg_txt.text = "Damage:		" + damage;
+        characteristics.spd_txt.text = "Attack speed:	" + bulletParticle.emission.rateOverTimeMultiplier;
+        characteristics.rng_txt.text = "Range:			" + shootRange;
+    }
+    
+
+    
+    
 }

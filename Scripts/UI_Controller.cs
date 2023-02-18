@@ -20,8 +20,13 @@ public class UI_Controller : MonoBehaviour
 
     public Text endText;
     public Text lose_timer;
-    public Button continue_btn;
-    public Button quit_btn;
+
+    [SerializeField] GameObject unlockedObj;
+    [SerializeField] Text unlockedTXT;
+    private float t_unlocked = 0f;
+    bool isUnlocked = false;
+
+    [SerializeField] Button basicTowerButton, teslaTowerButton, frostTowerButton, startWaveButton, continueButton, quitButton, menuButton;
 
     public Text WaveStarted;
     public Text WaveNum_TXT;
@@ -36,12 +41,18 @@ public class UI_Controller : MonoBehaviour
     private EnemySpawner spawner;
 
     private TowerFactory towerFactory;
-    private tower Anytower;
+    private tower currentTower;
 
+    public Image ChosedTowerImage;
     private float TimeToCloseUI = 10f;
     [SerializeField] basicTowerUI basicTowerUI;
+    public Text basicTowerPrice_txt;
     [SerializeField] teslaTowerUI teslaTowerUI;
+    public Text teslaTowerPrice_txt;
     [SerializeField] frostTowerUI frostTowerUI;
+    public Text frostTowerPrice_txt;
+
+
 
     private void Awake() 
     {
@@ -54,8 +65,17 @@ public class UI_Controller : MonoBehaviour
     }
     void Start()
     {
+        CheckTowerAvailable();
         points.text = pointsNum.ToString();
         coins.text =  "o " + totalCoins;
+
+        basicTowerButton.onClick.AddListener(delegate {towerFactory.chooseTower("BasicTower");});
+        teslaTowerButton.onClick.AddListener(delegate {towerFactory.chooseTower("TeslaTower");});
+        frostTowerButton.onClick.AddListener(delegate {towerFactory.chooseTower("FrostTower");});
+        startWaveButton.onClick.AddListener(delegate {spawner.StartSpawn();});
+        continueButton.onClick.AddListener(delegate {ContinueLVL();});
+        quitButton.onClick.AddListener(delegate {QuitLVL(true);});
+        menuButton.onClick.AddListener(delegate {QuitLVL(true);});
     }
     void Update()
     {
@@ -65,6 +85,7 @@ public class UI_Controller : MonoBehaviour
         Clicked();
         CoinAddFader();
         CoinsTextFader();  
+        UnlockTextFader();
     }
 
     public void AddPointForKill(int PointsToAdd)
@@ -79,7 +100,7 @@ public class UI_Controller : MonoBehaviour
         disTime = 1f;
         coins_added.color = Color.yellow;
 
-        int CalculatedCoins = Mathf.RoundToInt(UnityEngine.Random.Range(CoinToAdd, CoinToAdd * 2));
+        int CalculatedCoins = Mathf.RoundToInt(Mathf.Round(UnityEngine.Random.Range(CoinToAdd, CoinToAdd * 2 + 1)));
         totalCoins += CalculatedCoins;
         coins_added.text = "+" + CalculatedCoins;
         coins.text =  "o " + totalCoins;
@@ -142,9 +163,10 @@ public class UI_Controller : MonoBehaviour
         StartCoroutine(spawner.waveSpawn());
         spawner.start = true;
 
+        isUnlocked = false;
         endText.text = " ";
-        continue_btn.gameObject.SetActive(false);
-        quit_btn.gameObject.SetActive(false);
+        continueButton.gameObject.SetActive(false);
+        quitButton.gameObject.SetActive(false);
     }
 
     private void CheckLOSE()
@@ -162,28 +184,65 @@ public class UI_Controller : MonoBehaviour
     }
     public void CheckWIN()
     {
-        if (spawner.waveNum == 11 && spawner.start && spawner.transform.childCount == 0)
+        if (spawner.waveNum == 11 && spawner.start && spawner.transform.childCount == 0 && !spawner.isSpawnStarted)
         {
         spawner.start = false;
+
+        if (mapLevel == 1 && PlayerPrefs.GetInt("teslaTowerLock") == 0)
+        {
+            isUnlocked = true;
+            unlockedTXT.text = "Tesla tower unlocked";
+            PlayerPrefs.SetInt("teslaTowerLock", 1);
+        }
+        if (mapLevel == 2 && PlayerPrefs.GetInt("frostTowerLock") == 0)
+        {
+            isUnlocked = true;
+            unlockedTXT.text = "Frost tower unlocked";
+            PlayerPrefs.SetInt("frostTowerLock", 1);
+        }
     
-        continue_btn.gameObject.SetActive(true);
-        quit_btn.gameObject.SetActive(true);
+        continueButton.gameObject.SetActive(true);
+        quitButton.gameObject.SetActive(true);
 
         endText.color = Color.green;
         endText.text = "YOU WIN!";
         }
     }
 
-    public void Clicked()
+    private void CheckTowerAvailable()
     {
+        if (PlayerPrefs.GetInt("teslaTowerLock") == 1)
+            teslaTowerButton.gameObject.SetActive(true);
+        else
+            teslaTowerButton.gameObject.SetActive(false);
+
+        if (PlayerPrefs.GetInt("frostTowerLock") == 1)
+            frostTowerButton.gameObject.SetActive(true);
+        else
+            frostTowerButton.gameObject.SetActive(false);
+    }
+
+    public void Clicked()
+    {   
+        if (EventSystem.current.currentSelectedGameObject)
+            return;
+
         if (Input.GetMouseButtonDown(0))
         {
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             Physics.Raycast(ray, out hit);
-            
+
+            if (hit.transform.name == "Ground")
+            {
+                CloseAllUI();
+                towerFactory.chooseTower("empty");
+            }
+
+
             if (hit.transform.GetComponent<Waypoint>())
             {
+                CloseAllUI();
                 Waypoint waypoint = hit.transform.GetComponent<Waypoint>();     
                 if (towerFactory.towerType != "empty" && !waypoint.towerHere)
                 {
@@ -201,6 +260,7 @@ public class UI_Controller : MonoBehaviour
 
             if (hit.transform.name == "BuildButton")
             {
+                CloseAllUI();
                 if (totalCoins >= towerFactory.towerPrice)
                 {
                     towerFactory.AddTower();
@@ -208,13 +268,9 @@ public class UI_Controller : MonoBehaviour
                 }
                 else
                 {
-                    
-                    t_coins = 1f;
+                    CoinsErrorMessage("Not enough to build", Color.red);
                 }
             }
-
-            if (hit.transform.name == "Ground")
-            CloseAllUI();
 
             if (hit.transform.GetComponent<basicTower>())
             {
@@ -223,7 +279,7 @@ public class UI_Controller : MonoBehaviour
                 _basicTower.characteristics.Char_UI_On(TimeToCloseUI);
                 _basicTower.tower.UI_On(TimeToCloseUI);
                 _basicTower.Characteristic_text_updater();
-                _basicTower.lvlUp();
+                currentTower = _basicTower.tower;
             }
 
             if (hit.transform.GetComponent<teslaTower>())
@@ -233,7 +289,8 @@ public class UI_Controller : MonoBehaviour
                 _teslaTower.characteristics.Char_UI_On(TimeToCloseUI);
                 _teslaTower.tower.UI_On(TimeToCloseUI);
                 _teslaTower.Characteristic_text_updater();
-                _teslaTower.lvlUp();
+                currentTower = _teslaTower.tower;
+                
             }
 
             if (hit.transform.GetComponent<frostTower>())
@@ -243,7 +300,15 @@ public class UI_Controller : MonoBehaviour
                 _frostTower.characteristics.Char_UI_On(TimeToCloseUI);
                 _frostTower.tower.UI_On(TimeToCloseUI);
                 _frostTower.Characteristic_text_updater();
-                _frostTower.lvlUp();
+                currentTower = _frostTower.tower;
+            }
+
+            if (hit.transform.name == "LVL")
+                currentTower.LevelUpTower();
+            if (hit.transform.name == "DEL")
+            {
+                currentTower.DestroyTower();
+                CloseAllUI();
             }
         }
     }
@@ -279,7 +344,7 @@ public class UI_Controller : MonoBehaviour
     }
     private void CloseOtherCharacteristics(string towerType)
     {
-        if (towerType == "Tower")
+        if (towerType == "BasicTower")
         {
             teslaTowerUI._MenuCD = 0f;
             frostTowerUI._MenuCD = 0f;
@@ -310,6 +375,24 @@ public class UI_Controller : MonoBehaviour
             CurrentTower._MenuCD = 0;  
         }
         CloseOtherCharacteristics("CloseAll");
+    }
+    private void UnlockTextFader()
+    {
+        if (t_unlocked < 1 && isUnlocked)
+        {
+            t_unlocked += Time.deltaTime * 3;
+            unlockedObj.transform.localScale = new Vector3(t_unlocked, t_unlocked, t_unlocked);
+        }
+        else if (t_unlocked >= 1 && isUnlocked)
+        {
+            t_unlocked = Mathf.PingPong(Time.time / 2, 0.1f) + 1f;
+            unlockedObj.transform.localScale = new Vector3(t_unlocked, t_unlocked, t_unlocked);
+        }
+        else
+        {
+            t_unlocked = 0;
+            unlockedObj.transform.localScale = new Vector3(0, 0, 0);
+        }     
     }
 
     
